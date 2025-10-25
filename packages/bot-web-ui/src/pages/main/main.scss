@@ -1,3 +1,4 @@
+@import '../../styles/mixins.scss';
 
 .run-panel {
     // fix for the RTL issue on tab active line
@@ -48,7 +49,7 @@
         }
 
         &--active {
-            // css for onboard tour overlay
+            //css for onboard tour overlay
             &:before {
                 content: '';
                 position: fixed;
@@ -56,7 +57,7 @@
                 top: 0;
                 width: 100%;
                 height: 100%;
-                background: rgb(0 0 0 / 72%);
+                background: rgba(0, 0, 0, 0.72);
                 opacity: 0.7;
                 z-index: 100;
             }
@@ -350,7 +351,6 @@
     }
 }
 
-/* Rest of the code remains exactly the same from your original file below this point */
 .animation__wrapper {
     .animation {
         &__button#db-animation {
@@ -615,7 +615,7 @@
     }
 
     &__steps {
-        @media (height <= 730px) {
+        @media (max-height: 730px) {
             max-height: 40vh;
             overflow-y: auto;
         }
@@ -669,7 +669,7 @@
     font-size: 1.4rem;
     color: #ffee00;
 
-    @media (height <= 790px) {
+    @media (max-height: 790px) {
         max-height: 46vh;
         overflow-y: auto;
     }
@@ -728,7 +728,9 @@
 }
 
 .dbot-slider {
-    @include flex-center(flex-start);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
     flex-direction: column;
     position: fixed;
     left: 0;
@@ -859,13 +861,17 @@
             width: 100%;
 
             &__status {
-                @include flex-center(flex-start);
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
             }
 
             &__progress-bar {
                 width: 50%;
                 margin-bottom: unset;
-                @include flex-center(flex-start);
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
                 margin-inline-start: 1rem;
 
                 .progress-bar-circle {
@@ -903,11 +909,13 @@
 
 .dbot-tour-blink {
     animation: blink 1.25s infinite;
-    border-radius: $BORDER-RADIUS * 12.5;
+    border-radius: 12.5px;
     height: 2.5rem !important;
     width: 2.5rem !important;
     padding: 0.2rem 0;
-    @include flex-center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .beta-server-bot {
@@ -921,44 +929,4 @@
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-/* ===== TARGETED DASHBOARD COLORS ===== */
-
-/* 🟣 DEEP PURPLE: ONLY the main instruction paragraph */
-.main .dc-tabs__content .tab__dashboard__content .dc-text:first-of-type:not(h3):not(.table-header) {
-    color: #3c50c5 !important;
-}
-
-/* More specific for just the instruction text */
-.dashboard .subtitle:not(.table-subtitle):not(h3):not(.column-header) {
-    color: #465dc1 !important;
-}
-
-/* 🔵 DARK BLUE: ONLY "Your bots:" header (not table headers) */
-.main .dc-tabs__content .tab__dashboard__table > h3:first-of-type {
-    color: #321e8a !important;
-}
-
-/* Alternative selector for "Your bots:" only */
-.dashboard .bots-section h3:first-child:not(.table-header):not(.column-header) {
-    color: #321e8a !important;
-}
-
-/* Exclude table headers from color changes */
-.dashboard .table-header,
-.dashboard .column-header,
-.dashboard thead th,
-.dashboard th {
-    color: initial !important;
-}
-
-/* Ultra-specific: Target only the paragraph, not buttons or headers */
-.tab__dashboard__content > .dc-text.subtitle:not(h1):not(h2):not(h3):not(button) {
-    color: #6B46C1 !important;
-}
-
-/* Ultra-specific: Target only section title, not table headers */
-.tab__dashboard__table > h3:not(.table-header):not(thead *) {
-    color: #1e3a8a !important;
 }
