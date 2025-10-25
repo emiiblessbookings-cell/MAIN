@@ -208,7 +208,7 @@
             &__item {
                 border-radius: 8px 8px 0 0;
                 height: 4rem;
-                padding: 0 1rem; /* Reduced padding for tighter text spacing */
+                padding: 0 1rem;
                 width: auto;
                 max-width: 160px;
                 min-width: 100px;
@@ -216,12 +216,11 @@
                 @include flex-center;
                 margin: 0 0.1rem;
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                border: none;
+                border: 1px solid transparent;
                 position: relative;
                 overflow: hidden;
                 font-size: 1.2rem;
                 background: rgba(26, 31, 54, 0.8);
-                border: 1px solid transparent;
 
                 /* Enhanced hover effect */
                 &:hover {
@@ -234,7 +233,7 @@
 
                 @include mobile-or-tablet-screen {
                     height: 3.5rem;
-                    padding: 0 0.6rem; /* Even tighter on mobile */
+                    padding: 0 0.6rem;
                     max-width: 140px;
                     min-width: 80px;
                     font-size: 1rem;
@@ -247,11 +246,11 @@
                     align-items: center;
                     justify-content: center;
                     width: 100%;
-                    gap: 0.4rem; /* Reduced gap between icon and text */
+                    gap: 0.4rem;
                     padding: 0;
                     
                     @include mobile-or-tablet-screen {
-                        gap: 0.3rem; /* Even smaller gap on mobile */
+                        gap: 0.3rem;
                     }
                 }
 
@@ -906,8 +905,6 @@
 
 .dbot-tour-blink {
     animation: blink 1.25s infinite;
-    animation: blink 1.25s ease-in infinite;
-    animation: blink 1.25s ease-in infinite;
     border-radius: $BORDER-RADIUS * 12.5;
     height: 2.5rem !important;
     width: 2.5rem !important;
