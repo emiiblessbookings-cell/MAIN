@@ -70,17 +70,23 @@ $color-red-12: #8b0000; // Added missing red-12 (dark red)
 $color-red-13: #ff6b6b; // Added additional red shades
 $color-red-14: #ff5252;
 $color-violet: #4a3871;
-$color-white: #fff;
+$color-white: #f7f7faf5;
+
 $color-yellow: #ffad3a;
 $color-yellow-1: #b3760d;
 $color-yellow-2: #ffa912;
 $color-yellow-3: rgb(255 173 58 / 16%);
+$color-yellow-4: #fff7e6;
+$color-yellow-5: #6a4800;
+$color-yellow-6: #ffeabf;
 
 /* status colors */
 $color-status-warning: rgb(255 173 58 / 16%);
 $color-status-information: rgb(55 124 252 / 16%);
 $color-status-announcement: rgb(75 180 179 / 16%);
 $color-status-error: rgb(236 63 63 / 16%);
+$color-status-verified: rgba(0, 122, 34);
+$color-status-danger: rgba(196, 0, 0);
 
 /* alpha colors */
 $alpha-color-black-1: color.scale($color-black-7, $alpha: -28%);
