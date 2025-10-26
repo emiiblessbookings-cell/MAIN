@@ -1,11 +1,12 @@
 import React from 'react';
-import { OpenLiveChatLink, Text } from '@deriv/components';
-import { Localize, localize } from '@deriv/translations';
-import { DBOT_TABS } from 'Constants/bot-contents';
+import { getUrlBase } from '@/components/shared';
+import OpenLiveChatLink from '@/components/shared_ui/open-livechat-link';
+import Text from '@/components/shared_ui/text';
+import { DBOT_TABS } from '@/constants/bot-contents';
+import { Localize, localize } from '@deriv-com/translations';
 import { rudderStackSendOpenEvent } from '../../../analytics/rudderstack-common-events';
 import { handleOnConfirmAccumulator } from './utils/accumulator-helper-functions';
 import { IconAnnounce } from './announcement-components';
-import { getUrlBase } from '@deriv/shared';
 
 export type TContentItem = {
     id: number;
@@ -24,11 +25,6 @@ export type TAnnounce = {
     plain_text?: TContentItem[];
     media?: Array<string>;
     unordered_list?: TContentItem[];
-    event_name: string;
-    event_action?: {
-        confirm_button_text?: string;
-        cancel_button_text?: string;
-    };
 };
 
 export type TAnnouncement = {
@@ -48,13 +44,9 @@ export const ANNOUNCEMENTS: Record<string, TAnnouncement> = {
         announcement: {
             id: 'UPDATES_QUICK_STRATEGY_MODAL_ANNOUNCE',
             main_title: localize('Updates: Quick strategy modal'),
-            event_name: 'Updated: Quick Strategy Modal',
-            event_action: {
-                confirm_button_text: 'Explore now',
-            },
             confirm_button_text: localize('Explore now'),
             base_classname: 'announcement-dialog',
-            media: [getUrlBase('/public/videos/dbot-new-look-QS-and-accumulators-addition.gif')],
+            media: [getUrlBase('assets/images/dbot-new-look-QS-and-accumulators-addition.gif')],
             title: [
                 <Text key={0} as='div' align='left' size='xs' className='announcement-dialog__title'>
                     <Localize i18n_default_text="We've improved the Quick strategy (QS) modal for a better trading experience." />
@@ -100,10 +92,6 @@ export const ANNOUNCEMENTS: Record<string, TAnnouncement> = {
         announcement: {
             id: 'MOVING_STRATEGIES_ANNOUNCE',
             main_title: localize('Moving strategies to Deriv Bot'),
-            event_name: 'Moving strategies to Deriv Bot',
-            event_action: {
-                confirm_button_text: 'Import strategy',
-            },
             confirm_button_text: localize('Import strategy'),
             base_classname: 'announcement-dialog',
             title: (
@@ -155,7 +143,6 @@ export const ANNOUNCEMENTS: Record<string, TAnnouncement> = {
         announcement: {
             id: 'BLOCKLY_ANNOUNCE',
             main_title: localize('Google Blockly v10 update'),
-            event_name: 'Google Blockly v10 update',
             base_classname: 'announcement-dialog',
             title: (
                 <Localize
@@ -196,11 +183,6 @@ export const ANNOUNCEMENTS: Record<string, TAnnouncement> = {
         announcement: {
             id: 'ACCUMULATOR_ANNOUNCE',
             main_title: localize('Accumulators now on Deriv Bot'),
-            event_name: 'Accumulators is now on Deriv Bot',
-            event_action: {
-                confirm_button_text: 'Try now',
-                cancel_button_text: 'Learn more',
-            },
             confirm_button_text: localize('Try now'),
             cancel_button_text: localize('Learn more'),
             base_classname: 'announcement-dialog',

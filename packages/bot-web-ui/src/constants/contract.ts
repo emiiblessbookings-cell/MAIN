@@ -1,5 +1,5 @@
-import { getTotalProfit, TContractStore } from '@deriv/shared';
-import { localize } from '@deriv/translations';
+import { getTotalProfit, TContractStore } from '@/components/shared';
+import { localize } from '@deriv-com/translations';
 
 export type TContract = {
     name: string;
@@ -190,7 +190,6 @@ export type TValidationRuleIndex =
     | 'has_contract_update_take_profit'
     | 'contract_update_take_profit';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ValidationRuleFunc = (value: number, options: any, contract_store: TContractStore) => boolean;
 
 type ValidationConditionFunc = (contract_store: TContractStore) => boolean;

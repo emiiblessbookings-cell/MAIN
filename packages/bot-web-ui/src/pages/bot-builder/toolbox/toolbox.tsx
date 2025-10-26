@@ -1,18 +1,19 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Icon, Text } from '@deriv/components';
-import { observer, useStore } from '@deriv/stores';
-import { localize } from '@deriv/translations';
+import { observer } from 'mobx-react-lite';
+import Text from '@/components/shared_ui/text';
+import { useStore } from '@/hooks/useStore';
+import { LabelPairedChevronDownMdFillIcon } from '@deriv/quill-icons/LabelPaired';
+import { localize } from '@deriv-com/translations';
+import { useDevice } from '@deriv-com/ui';
 import { rudderStackSendOpenEvent } from '../../../analytics/rudderstack-common-events';
-import { useDBotStore } from '../../../stores/useDBotStore';
 import ToolbarButton from '../toolbar/toolbar-button';
 import SearchBox from './search-box';
 import { ToolboxItems } from './toolbox-items';
 
 const Toolbox = observer(() => {
-    const { ui } = useStore();
-    const { is_desktop } = ui;
-    const { toolbox, flyout, quick_strategy } = useDBotStore();
+    const { isDesktop } = useDevice();
+    const { toolbox, flyout, quick_strategy } = useStore();
     const {
         hasSubCategory,
         is_search_loading,
@@ -31,7 +32,7 @@ const Toolbox = observer(() => {
     const { setFormVisibility } = quick_strategy;
     const { setVisibility, selected_category } = flyout;
 
-    const toolbox_ref = React.useRef(ToolboxItems);
+    const toolbox_ref = React.useRef(ToolboxItems());
     const [is_open, setOpen] = React.useState(true);
 
     React.useEffect(() => {
@@ -50,7 +51,7 @@ const Toolbox = observer(() => {
         });
     };
 
-    if (is_desktop) {
+    if (isDesktop) {
         return (
             <div className='db-toolbox' data-testid='dashboard__toolbox'>
                 <ToolbarButton
@@ -76,7 +77,7 @@ const Toolbox = observer(() => {
                                     'db-toolbox__title__chevron--active': is_open,
                                 })}
                             >
-                                <Icon icon='IcChevronDownBold' />
+                                <LabelPairedChevronDownMdFillIcon fill='var(--text-general)' />
                             </span>
                         </div>
                     </div>
@@ -125,7 +126,7 @@ const Toolbox = observer(() => {
                                                                         is_sub_category_open,
                                                                 })}
                                                             >
-                                                                <Icon icon='IcChevronDownBold' />
+                                                                <LabelPairedChevronDownMdFillIcon fill='var(--text-general)' />
                                                             </div>
                                                         )}
                                                     </div>
@@ -153,9 +154,7 @@ const Toolbox = observer(() => {
                                                                     }}
                                                                 >
                                                                     <Text size='xxs'>
-                                                                        {localize(
-                                                                            subCategory.getAttribute('name') as string
-                                                                        )}
+                                                                        {subCategory.getAttribute('name') as string}
                                                                     </Text>
                                                                 </div>
                                                             );

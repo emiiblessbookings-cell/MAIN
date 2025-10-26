@@ -1,12 +1,12 @@
 import React from 'react';
-import { observer } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import DraggableResizeWrapper from 'Components/draggable/draggable-resize-wrapper';
-import TradingViewComponent from 'Components/trading-view-chart/trading-view';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import DraggableResizeWrapper from '@/components/draggable/draggable-resize-wrapper';
+import TradingViewComponent from '@/components/trading-view-chart/trading-view';
+import { useStore } from '@/hooks/useStore';
+import { localize } from '@deriv-com/translations';
 
 const TradingViewModal = observer(() => {
-    const { dashboard } = useDBotStore();
+    const { dashboard } = useStore();
     const { is_trading_view_modal_visible, setTradingViewModalVisibility } = dashboard;
 
     return (

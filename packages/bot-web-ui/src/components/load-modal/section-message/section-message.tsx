@@ -1,8 +1,8 @@
 import React from 'react';
-import { Icon, Text } from '@deriv/components';
+import Text from '@/components/shared_ui/text';
 
 type TSectionMessage = {
-    icon: string;
+    icon: React.ReactNode;
     message: string;
     className?: string;
 };
@@ -10,11 +10,7 @@ type TSectionMessage = {
 const SectionMessage: React.FC<TSectionMessage> = ({ icon, message, className }) => {
     return (
         <div className={className}>
-            {icon && (
-                <span className='icon'>
-                    <Icon icon={icon} />
-                </span>
-            )}
+            {icon && <span className='icon'>{icon}</span>}
             <span className='text'>
                 <Text size='xs'>{message}</Text>
             </span>

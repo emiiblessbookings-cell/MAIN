@@ -1,13 +1,17 @@
 import React from 'react';
 import classNames from 'classnames';
 import ContentLoader from 'react-content-loader';
-import { getContractTypeName } from '@deriv/bot-skeleton';
-import { isDbotRTL } from '@deriv/bot-skeleton/src/utils/workspace';
-import { Icon, IconTradeTypes, Money, Popover } from '@deriv/components';
-import { convertDateFormat } from '@deriv/shared';
-import { localize } from '@deriv/translations';
-import { TContractInfo } from 'Components/summary/summary-card.types';
-import { popover_zindex } from 'Constants/z-indexes';
+import Money from '@/components/shared_ui/money';
+import { TContractInfo } from '@/components/summary/summary-card.types';
+import { popover_zindex } from '@/constants/z-indexes';
+import { getContractTypeName } from '@/external/bot-skeleton';
+import { isDbotRTL } from '@/external/bot-skeleton/utils/workspace';
+import { LegacyRadioOffIcon, LegacyRadioOnIcon } from '@deriv/quill-icons';
+import { Localize, localize } from '@deriv-com/translations';
+import { MarketIcon } from '../market/market-icon';
+import { convertDateFormat } from '../shared';
+import Popover from '../shared_ui/popover';
+import { TradeTypeIcon } from '../trade-type/trade-type-icon';
 
 type TTransactionIconWithText = {
     icon: React.ReactElement;
@@ -85,7 +89,7 @@ const PopoverItem = ({ icon, title, children }: TPopoverItem) => (
 const PopoverContent = ({ contract }: TPopoverContent) => (
     <div className='transactions__popover-content'>
         {contract.transaction_ids && (
-            <PopoverItem title={localize('Reference IDs')}>
+            <PopoverItem title={<Localize i18n_default_text='Reference IDs' />}>
                 {contract.transaction_ids.buy && (
                     <div className='transactions__popover-value'>
                         {`${contract.transaction_ids.buy} ${localize('(Buy)')}`}
@@ -167,14 +171,11 @@ const Transaction = ({ contract, active_transaction_id, onClickTransaction }: TT
                 className='transactions__item'
                 onClick={() => onClickTransaction && onClickTransaction(contract?.transaction_ids?.buy || null)}
             >
-                <div
-                    className='transactions__cell transactions__trade-type'
-                    data-testid='dt_transactions_item_trade_type'
-                >
+                <div className='transactions__cell transactions__trade-type'>
                     <div className='transactions__loader-container'>
                         {contract ? (
                             <TransactionIconWithText
-                                icon={<Icon icon={`IcUnderlying${contract.underlying}`} size={16} />}
+                                icon={<MarketIcon type={contract.underlying} />}
                                 title={contract.display_name || ''}
                             />
                         ) : (
@@ -184,7 +185,7 @@ const Transaction = ({ contract, active_transaction_id, onClickTransaction }: TT
                     <div className='transactions__loader-container'>
                         {contract ? (
                             <TransactionIconWithText
-                                icon={<IconTradeTypes type={contract.contract_type || ''} size={16} />}
+                                icon={<TradeTypeIcon type={contract.contract_type || ''} size='sm' />}
                                 title={getContractTypeName(contract)}
                             />
                         ) : (
@@ -192,41 +193,30 @@ const Transaction = ({ contract, active_transaction_id, onClickTransaction }: TT
                         )}
                     </div>
                 </div>
-                <div
-                    className='transactions__cell transactions__entry-spot'
-                    data-testid='dt_transactions_item_entry_spot'
-                >
+                <div className='transactions__cell transactions__entry-spot'>
                     <TransactionIconWithText
-                        icon={<Icon icon='IcContractEntrySpot' />}
+                        icon={<LegacyRadioOnIcon height={10} width={10} />}
                         title={localize('Entry spot')}
                         message={contract?.entry_tick ?? <TransactionFieldLoader />}
                     />
                 </div>
-                <div
-                    className='transactions__cell transactions__exit-spot'
-                    data-testid='dt_transactions_item_exit_spot'
-                >
+                <div className='transactions__cell transactions__exit-spot'>
                     <TransactionIconWithText
-                        icon={<Icon icon='IcContractExitSpot' />}
+                        icon={<LegacyRadioOffIcon height={10} width={10} />}
                         title={localize('Exit spot')}
                         message={contract?.exit_tick ?? <TransactionFieldLoader />}
                     />
                 </div>
-                <div className='transactions__cell transactions__stake' data-testid='dt_transactions_item_stake'>
+                <div className='transactions__cell transactions__stake'>
                     {contract ? (
                         <Money amount={contract.buy_price} currency={contract.currency} show_currency />
                     ) : (
                         <TransactionFieldLoader />
                     )}
                 </div>
-                <div className='transactions__cell transactions__profit' data-testid='dt_transactions_item_profit'>
+                <div className='transactions__cell transactions__profit'>
                     {contract?.is_completed ? (
                         <div
-                            data-testid={
-                                contract?.profit && contract?.profit >= 0
-                                    ? 'dt_transactions_profit_win'
-                                    : 'dt_transactions_profit_loss'
-                            }
                             className={classNames({
                                 'transactions__profit--win': contract?.profit && contract?.profit >= 0,
                                 'transactions__profit--loss': contract?.profit && contract?.profit < 0,

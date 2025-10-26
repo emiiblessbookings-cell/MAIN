@@ -1,5 +1,5 @@
-import { Localize, localize } from '@deriv/translations';
 import React from 'react';
+import { Localize, localize } from '@deriv-com/translations';
 
 export const LocalizeHTMLForSellConditions = additional_data => {
     const { max_payout, max_ticks } = additional_data ?? {

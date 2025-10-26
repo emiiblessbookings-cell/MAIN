@@ -1,11 +1,15 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Icon, Input, Text, ThemedScrollbars } from '@deriv/components';
-import { getPlatformSettings } from '@deriv/shared';
-import { observer, useStore } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import { help_content_config } from 'Utils/help-content/help-content.config';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '@/hooks/useStore';
+import GTM from '@/utils/gtm';
+import { help_content_config } from '@/utils/help-content/help-content.config';
+import { LabelPairedCircleExclamationCaptionFillIcon } from '@deriv/quill-icons';
+import { localize } from '@deriv-com/translations';
+import { getPlatformSettings } from '../shared';
+import Input from '../shared_ui/input';
+import Text from '../shared_ui/text';
+import ThemedScrollbars from '../shared_ui/themed-scrollbars';
 import FlyoutBlockGroup from './flyout-block-group';
 import HelpBase from './help-contents';
 
@@ -61,10 +65,11 @@ const FlyoutContent = (props: TFlyoutContent) => {
                 {selected_category?.getAttribute('id') === 'indicators' && (
                     <div className='flyout__content-disclaimer'>
                         <span className='flyout__content-disclaimer-icon'>
-                            <Icon
-                                icon='IcBlackWarning'
-                                custom_color='#000000'
+                            <LabelPairedCircleExclamationCaptionFillIcon
                                 className='flyout__content-disclaimer__warning-icon'
+                                height='24px'
+                                width='24px'
+                                fill='var(--text-general)'
                             />
                         </span>
                         <span className='flyout__content-disclaimer-text'>
@@ -77,7 +82,7 @@ const FlyoutContent = (props: TFlyoutContent) => {
                 )}
                 {is_empty ? (
                     <div className='flyout__search-empty'>
-                        <Text as='h2' weight='bold' line_height='xxs'>
+                        <Text as='h2' weight='bold' lineHeight='xs'>
                             {localize('No results found')}
                         </Text>
                     </div>
@@ -85,7 +90,7 @@ const FlyoutContent = (props: TFlyoutContent) => {
                     flyout_content.map((node, index) => {
                         const tag_name = node.tagName.toUpperCase();
                         switch (tag_name) {
-                            case Blockly.Xml.NODE_BLOCK: {
+                            case window.Blockly.Xml.NODE_BLOCK: {
                                 const block_type = (node.getAttribute('type') || '') as string;
 
                                 return (
@@ -101,7 +106,7 @@ const FlyoutContent = (props: TFlyoutContent) => {
                                                 : false
                                         }
                                         onInfoClick={
-                                            help_content_config(__webpack_public_path__)[block_type] &&
+                                            help_content_config(window.__webpack_public_path__)[block_type] &&
                                             (is_search_flyout
                                                 ? () => setHelpContent(node)
                                                 : () => initFlyoutHelp(node, block_type))
@@ -110,7 +115,7 @@ const FlyoutContent = (props: TFlyoutContent) => {
                                     />
                                 );
                             }
-                            case Blockly.Xml.NODE_LABEL: {
+                            case window.Blockly.Xml.NODE_LABEL: {
                                 return (
                                     <div
                                         key={`${node.getAttribute('text')}${index}`}
@@ -120,7 +125,7 @@ const FlyoutContent = (props: TFlyoutContent) => {
                                     </div>
                                 );
                             }
-                            case Blockly.Xml.NODE_INPUT: {
+                            case window.Blockly.Xml.NODE_INPUT: {
                                 return (
                                     <Input
                                         key={`${node.getAttribute('name')}${index}`}
@@ -132,7 +137,7 @@ const FlyoutContent = (props: TFlyoutContent) => {
                                     />
                                 );
                             }
-                            case Blockly.Xml.NODE_BUTTON: {
+                            case window.Blockly.Xml.NODE_BUTTON: {
                                 const callback_key = node.getAttribute('callbackKey');
                                 const callback_id = node.getAttribute('id') as string;
 
@@ -177,8 +182,7 @@ const FlyoutContent = (props: TFlyoutContent) => {
 };
 
 const Flyout = observer(() => {
-    const { flyout, flyout_help } = useDBotStore();
-    const { gtm } = useStore();
+    const { flyout, flyout_help } = useStore();
     const { active_helper, initFlyoutHelp, setHelpContent } = flyout_help;
     const {
         flyout_content,
@@ -193,15 +197,13 @@ const Flyout = observer(() => {
         first_get_variable_block_index,
     } = flyout;
 
-    const { pushDataLayer } = gtm;
-
     React.useEffect(() => {
         onMount();
         return () => onUnmount();
     }, [onMount, onUnmount]);
 
     if (is_visible && is_search_flyout) {
-        pushDataLayer({ event: 'dbot_search_results', value: true });
+        GTM?.pushDataLayer?.({ event: 'dbot_search_results', value: true });
     }
 
     const total_result = Object.keys(flyout_content).length;

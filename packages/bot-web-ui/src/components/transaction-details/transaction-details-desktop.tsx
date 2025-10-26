@@ -1,13 +1,13 @@
 import React from 'react';
-import { observer, useStore } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import DraggableResizeWrapper from 'Components/draggable/draggable-resize-wrapper';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import DraggableResizeWrapper from '@/components/draggable/draggable-resize-wrapper';
+import { useStore } from '@/hooks/useStore';
+import { localize } from '@deriv-com/translations';
 import DesktopTransactionTable from './desktop-transaction-table';
 import { TColumn, TRunPanelStore, TTransactionStore } from './transaction-details.types';
 import './transaction-details-desktop.scss';
 
-const transaction_columns: TColumn[] = [
+const transaction_columns = (): TColumn[] => [
     { key: 'timestamp', label: localize('Timestamp'), extra_class: '--grow-big' },
     { key: 'reference', label: localize('Reference'), extra_class: '--grow-mid' },
     { key: 'market', label: localize('Market') },
@@ -19,7 +19,7 @@ const transaction_columns: TColumn[] = [
 ];
 
 /* TODO: Add back account & balance when we have support from transaction store */
-const result_columns: TColumn[] = [
+const result_columns = (): TColumn[] => [
     { key: 'account', label: localize('Account'), extra_class: '--grow-mid' },
     { key: 'no_of_runs', label: localize('No. of runs') },
     { key: 'total_stake', label: localize('Total stake') },
@@ -33,7 +33,7 @@ const result_columns: TColumn[] = [
 const TransactionDetailsDesktop = observer(() => {
     const { client } = useStore();
     const { loginid, balance } = client;
-    const { transactions } = useDBotStore();
+    const { transactions } = useStore();
     const {
         toggleTransactionDetailsModal,
         is_transaction_details_modal_open,
@@ -55,9 +55,9 @@ const TransactionDetailsDesktop = observer(() => {
                     enableResizing
                 >
                     <DesktopTransactionTable
-                        transaction_columns={transaction_columns}
+                        transaction_columns={transaction_columns()}
                         transactions={transaction_list}
-                        result_columns={result_columns}
+                        result_columns={result_columns()}
                         result={statistics}
                         account={loginid ?? ''}
                         balance={balance ?? 0}

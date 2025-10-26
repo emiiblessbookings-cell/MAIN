@@ -1,3 +1,5 @@
+@use 'components/shared/styles/mixins' as *;
+
 .strategy-template-picker {
     width: calc(100% - 3rem);
     margin: 1.6rem;
@@ -65,6 +67,12 @@
             justify-content: space-between;
             text-decoration: none;
             border-bottom: 1px solid var(--general-section-1);
+
+            svg {
+                @include is-RTL {
+                    transform: rotate(180deg);
+                }
+            }
         }
 
         .quill-typography {
@@ -166,12 +174,15 @@
         &__item {
             display: flex;
             justify-content: space-between;
+
             &__description {
                 width: 25rem;
                 font-size: 1.4rem;
                 text-align: end;
             }
+
             @include tablet-screen;
+
             @include mobile-screen {
                 &__description {
                     width: 25rem;
@@ -198,6 +209,12 @@
     &__header-close {
         @include rtl {
             right: 2.4rem;
+        }
+
+        svg {
+            path {
+                fill: var(--text-general);
+            }
         }
     }
 }

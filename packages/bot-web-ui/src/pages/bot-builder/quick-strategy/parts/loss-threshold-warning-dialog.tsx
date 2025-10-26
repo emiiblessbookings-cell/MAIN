@@ -1,15 +1,15 @@
-import React from 'react';
-import { Checkbox, Dialog } from '@deriv/components';
-import { observer } from '@deriv/stores';
-import { Localize, localize } from '@deriv/translations';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import Checkbox from '@/components/shared_ui/checkbox';
+import Dialog from '@/components/shared_ui/dialog';
+import { useStore } from '@/hooks/useStore';
+import { Localize, localize } from '@deriv-com/translations';
 import useQsSubmitHandler from '../form-wrappers/useQsSubmitHandler';
 import './loss-threshold-warning-dialog.scss';
 
 const base_classname = 'loss-threshold-warning-dialog';
 
 const LossThresholdWarningDialog = observer(() => {
-    const { quick_strategy } = useDBotStore();
+    const { quick_strategy } = useStore();
     const { loss_threshold_warning_data, setLossThresholdWarningData, initializeLossThresholdWarningData } =
         quick_strategy;
     const { proceedFormSubmission } = useQsSubmitHandler();
@@ -34,7 +34,7 @@ const LossThresholdWarningDialog = observer(() => {
 
     return (
         <Dialog
-            portal_element_id='modal_root_absolute'
+            portal_element_id='modal_root'
             title={localize('Are you sure you want to continue?')}
             is_visible={loss_threshold_warning_data.show}
             confirm_button_text={localize('Yes, continue')}

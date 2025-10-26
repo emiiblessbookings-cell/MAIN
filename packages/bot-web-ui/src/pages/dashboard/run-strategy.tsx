@@ -1,5 +1,4 @@
-import React from 'react';
-import TradeAnimation from 'Components/trade-animation';
+import TradeAnimation from '@/components/trade-animation';
 
 const RunStrategy = () => (
     <div className='toolbar__section' data-testid='dt_run_strategy'>

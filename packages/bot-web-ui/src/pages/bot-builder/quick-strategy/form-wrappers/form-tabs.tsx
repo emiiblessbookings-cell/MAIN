@@ -1,7 +1,7 @@
 import React, { KeyboardEvent } from 'react';
 import classNames from 'classnames';
-import { Text } from '@deriv/components';
-import { observer } from '@deriv/stores';
+import { observer } from 'mobx-react-lite';
+import Text from '@/components/shared_ui/text';
 import { FORM_TABS } from '../config';
 import { TDescriptionItem } from '../types';
 
@@ -14,7 +14,7 @@ type TFormTabs = {
 const FormTabs: React.FC<TFormTabs> = observer(({ active_tab, onChange, description }) => (
     <div className='qs__body__content__head'>
         <div className='qs__body__content__head__tabs'>
-            {FORM_TABS.map((tab, index) => {
+            {FORM_TABS().map((tab, index) => {
                 const active = tab.value === active_tab;
                 const cs = 'qs__body__content__head__tabs__tab';
                 return (

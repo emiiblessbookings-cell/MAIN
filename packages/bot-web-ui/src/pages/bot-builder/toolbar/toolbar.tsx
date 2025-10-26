@@ -1,17 +1,16 @@
 import React from 'react';
-import { Dialog } from '@deriv/components';
-import { observer, useStore } from '@deriv/stores';
-import { Localize, localize } from '@deriv/translations';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import Dialog from '@/components/shared_ui/dialog';
+import { useStore } from '@/hooks/useStore';
+import { Localize, localize } from '@deriv-com/translations';
+import { useDevice } from '@deriv-com/ui';
 import { rudderStackSendOpenEvent } from '../../../analytics/rudderstack-common-events';
 import ToolbarButton from './toolbar-button';
 import WorkspaceGroup from './workspace-group';
 
 const Toolbar = observer(() => {
-    const { run_panel, toolbar, quick_strategy } = useDBotStore();
-    const {
-        ui: { is_desktop },
-    } = useStore();
+    const { run_panel, toolbar, quick_strategy } = useStore();
+    const { isDesktop } = useDevice();
     const { is_dialog_open, closeResetDialog, onResetOkButtonClick: onOkButtonClick } = toolbar;
     const { is_running } = run_panel;
     const { setFormVisibility } = quick_strategy;
@@ -19,7 +18,6 @@ const Toolbar = observer(() => {
     const cancel_button_text = is_running ? localize('No') : localize('Cancel');
     const handleQuickStrategyOpen = () => {
         setFormVisibility(true);
-        // send to rs if quick strategy is opened from bot builder (mobile)
         rudderStackSendOpenEvent({
             subpage_name: 'bot_builder',
             subform_source: 'bot_builder',
@@ -30,19 +28,20 @@ const Toolbar = observer(() => {
         <React.Fragment>
             <div className='toolbar dashboard__toolbar' data-testid='dt_dashboard_toolbar'>
                 <div className='toolbar__section'>
-                    {!is_desktop && (
+                    {!isDesktop && (
                         <ToolbarButton
                             popover_message={localize('Click here to start building your Deriv Bot.')}
                             button_id='db-toolbar__get-started-button'
                             button_classname='toolbar__btn toolbar__btn--icon toolbar__btn--start'
                             buttonOnClick={handleQuickStrategyOpen}
                             button_text={localize('Quick strategy')}
+                            is_bot_running={is_running}
                         />
                     )}
-                    {is_desktop && <WorkspaceGroup />}
+                    {isDesktop && <WorkspaceGroup />}
                 </div>
             </div>
-            {!is_desktop && <WorkspaceGroup />}
+            {!isDesktop && <WorkspaceGroup />}
             <Dialog
                 portal_element_id='modal_root'
                 title={localize('Are you sure?')}

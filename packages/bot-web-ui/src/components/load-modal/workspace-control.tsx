@@ -1,33 +1,32 @@
-import React from 'react';
-import { Icon } from '@deriv/components';
-import { observer } from '@deriv/stores';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '@/hooks/useStore';
+import { LabelPairedMinusCaptionRegularIcon, LabelPairedPlusCaptionRegularIcon } from '@deriv/quill-icons/LabelPaired';
 
 type TWorkspaceControlProps = {
     mockZoomInOut?: (is_zoom_in: boolean) => void;
 };
 
 const WorkspaceControl = observer(({ mockZoomInOut }: TWorkspaceControlProps) => {
-    const { dashboard } = useDBotStore();
+    const { dashboard } = useStore();
     const { onZoomInOutClick } = dashboard;
 
     return (
         <div className='load-strategy__preview-workspace-controls'>
-            <Icon
-                icon={'IcAddRounded'}
+            <LabelPairedPlusCaptionRegularIcon
                 className='load-strategy__preview-workspace-icon'
                 onClick={() => {
                     mockZoomInOut ? mockZoomInOut(true) : onZoomInOutClick(true);
                 }}
-                data_testid='zoom-in'
+                data-testid='zoom-in'
+                fill='var(--text-general)'
             />
-            <Icon
-                icon={'IcMinusRounded'}
+            <LabelPairedMinusCaptionRegularIcon
                 className='load-strategy__preview-workspace-icon'
                 onClick={() => {
                     mockZoomInOut ? mockZoomInOut(false) : onZoomInOutClick(false);
                 }}
-                data_testid='zoom-out'
+                data-testid='zoom-out'
+                fill='var(--text-general)'
             />
         </div>
     );

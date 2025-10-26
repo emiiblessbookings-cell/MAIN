@@ -1,16 +1,18 @@
 import React from 'react';
-import { Button, Icon, Text } from '@deriv/components';
-import { observer } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import { help_content_config, help_content_types } from 'Utils/help-content/help-content.config';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '@/hooks/useStore';
+import { help_content_config, help_content_types } from '@/utils/help-content/help-content.config';
+import { LabelPairedArrowLeftCaptionRegularIcon } from '@deriv/quill-icons/LabelPaired';
+import { localize } from '@deriv-com/translations';
+import Button from '../../shared_ui/button';
+import Text from '../../shared_ui/text';
 import FlyoutBlock from '../flyout-block';
 import FlyoutImage from './flyout-img';
 import FlyoutText from './flyout-text';
 import FlyoutVideo from './flyout-video';
 
 const HelpBase = observer(() => {
-    const { flyout, flyout_help } = useDBotStore();
+    const { flyout, flyout_help } = useStore();
     const {
         block_node,
         block_type,
@@ -24,14 +26,14 @@ const HelpBase = observer(() => {
     } = flyout_help;
     const { is_search_flyout } = flyout;
 
-    const block_help_component = help_string && help_content_config(__webpack_public_path__)[block_type];
+    const block_help_component = help_string && help_content_config(window.__webpack_public_path__)[block_type];
     let text_count = 0;
 
     return (
         <React.Fragment>
             <div className='flyout__help-header' data-testid='dt_flyout_help_base'>
                 <button className='dc-btn flyout__button-back' onClick={onBackClick}>
-                    <Icon icon='IcArrowLeft' />
+                    <LabelPairedArrowLeftCaptionRegularIcon height='16px' width='16px' fill='var(--text-general)' />
                 </button>
                 <Text weight='bold' className='flyout__help-title'>
                     {title}
@@ -41,7 +43,7 @@ const HelpBase = observer(() => {
                         className='flyout__button-add'
                         has_effect
                         id={`db-flyout-help__add--${block_type}`}
-                        onClick={() => Blockly.derivWorkspace.addBlockNode(block_node)}
+                        onClick={() => window.Blockly.derivWorkspace.addBlockNode(block_node)}
                         primary
                         text={localize('Add')}
                         type='button'

@@ -1,4 +1,4 @@
-@import '../../../styles/mixins.scss';
+@use 'components/shared/styles/mixins' as *;
 
 .qs {
     --sidebar-width: 24rem;
@@ -18,6 +18,7 @@
         --footer-height: 4.2rem;
         --input-action-height: 3rem;
         --input-action-width: 3rem;
+
         width: 100%;
     }
 
@@ -28,10 +29,12 @@
 
     &__head {
         @include flex-center(space-between);
+
         border-bottom: 1px solid var(--border-divider);
 
         &__title {
             @extend .x-center;
+
             padding: 0 2.4rem;
             height: var(--header-height);
             background-color: var(--general-section-1);
@@ -44,6 +47,12 @@
             span {
                 &:hover {
                     cursor: pointer;
+                }
+
+                svg {
+                    path {
+                        fill: var(--text-general);
+                    }
                 }
             }
         }
@@ -117,6 +126,7 @@
 
             &__head {
                 @include flex-center;
+
                 padding-bottom: 1rem;
 
                 @include mobile-or-tablet-screen {
@@ -126,6 +136,7 @@
 
                 &__tabs {
                     @extend .x-center;
+
                     background-color: var(--general-section-1);
                     padding: 0.4rem;
                     border-radius: 0.6rem;
@@ -203,14 +214,24 @@
             }
 
             &__footer {
-                height: var(--footer-height);
                 border-top: 1px solid var(--border-divider);
-                @include flex-center(flex-end);
-                padding: 1.6rem 2.4rem;
                 background-color: var(--general-main-1);
+                height: 8.4rem;
+                width: 100%;
+                padding-right: 2.4rem;
+
+                @include mobile-screen {
+                    height: 6rem;
+                    position: fixed;
+                    z-index: 10000;
+                    bottom: 0;
+                }
+
+                @include flex-center(flex-end);
 
                 button {
                     margin-inline-end: 1rem;
+                    height: 4rem;
 
                     &:last-child {
                         margin-inline-end: 0;
@@ -223,25 +244,26 @@
     &__form {
         &__container {
             min-height: 10rem;
+
             // to overwrite the height of the ThemedScrollbar
             max-height: calc(100vh - 23rem) !important;
-
-            @include desktop-screen {
-                height: calc(100vh - 16rem) !important;
-            }
-
             margin-bottom: 1rem;
             overflow-y: auto;
+
+            @include desktop-screen {
+                height: calc(100vh - 23.5rem) !important;
+            }
 
             @include mobile-screen {
                 margin-bottom: 0;
                 max-height: calc(100% - 12.2rem) !important;
             }
 
-            &--no-footer {
+            &--footer {
                 max-height: 100% !important;
 
                 @include mobile-screen {
+                    margin-bottom: 9rem;
                     max-height: calc(100% - 8rem) !important;
                 }
             }
@@ -324,6 +346,9 @@
                     line-height: var(--input-height);
                     text-align: center;
                     font-size: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
 
                     &:first-child {
                         border-top-left-radius: 4px;
@@ -416,6 +441,7 @@
 
             &__field[name='symbol'] {
                 caret-color: auto;
+                margin-inline-start: 2.4rem;
             }
 
             &__trailing-icon {
@@ -487,6 +513,7 @@
 
     .seddle-actions {
         @include flex-center;
+
         position: absolute;
         background: transparent;
         border: none;
@@ -526,6 +553,7 @@
 
             &__leading-icon {
                 @extend .seddle-actions;
+
                 left: 0.3rem;
                 color: var(--text-general);
 
@@ -545,6 +573,7 @@
 
             &__trailing-icon {
                 @extend .seddle-actions;
+
                 right: 1rem;
                 color: var(--text-general);
 
@@ -580,6 +609,7 @@
 
     &__input-label {
         @extend .x-center;
+
         height: var(--input-height);
 
         &__wrapper {
@@ -592,6 +622,7 @@
 
         &__container {
             @extend .x-center;
+
             height: calc(var(--input-height) - 0.5rem);
             width: 100%;
 
@@ -607,7 +638,7 @@
             .dc-toggle-switch__label {
                 width: 4.6rem;
                 padding: 0 0.2rem;
-                background: var(--core-color-opacity-black-200, rgba(0, 0, 0, 0.16));
+                background: var(--core-color-opacity-black-200, rgb(0 0 0 / 16%));
                 margin-right: 0;
             }
         }

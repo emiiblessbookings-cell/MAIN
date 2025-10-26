@@ -1,5 +1,6 @@
 import React from 'react';
-import { Popover, Text } from '@deriv/components';
+import Popover from '@/components/shared_ui/popover';
+import Text from '@/components/shared_ui/text';
 
 type TQSInputLabel = {
     children?: React.ReactNode;
@@ -15,7 +16,6 @@ const QSInputLabel: React.FC<TQSInputLabel> = ({ label, description, additional_
     } else {
         tooltip_msg = description;
     }
-
     return (
         <div className='qs__form__field'>
             <div className='qs__input-label'>

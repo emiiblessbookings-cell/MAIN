@@ -1,16 +1,21 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Icon, Modal, Text } from '@deriv/components';
-import { observer, useStore } from '@deriv/stores';
-import { DBOT_TABS } from 'Constants/bot-contents';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import Modal from '@/components/shared_ui/modal';
+import Text from '@/components/shared_ui/text';
+import { DBOT_TABS } from '@/constants/bot-contents';
+import useIsTNCNeeded from '@/hooks/useIsTNCNeeded';
+import { useStore } from '@/hooks/useStore';
+import { LegacyClose1pxIcon } from '@deriv/quill-icons/Legacy';
+import { useDevice } from '@deriv-com/ui';
 import { SIDEBAR_INTRO } from './constants';
 
 const InfoPanel = observer(() => {
-    const {
-        ui: { is_desktop },
-    } = useStore();
-    const { dashboard } = useDBotStore();
+    const { isDesktop } = useDevice();
+    const { dashboard } = useStore();
+    const is_tnc_needed = useIsTNCNeeded();
+    const [is_tour_open, setIsTourOpen] = React.useState(false);
+
     const {
         active_tour,
         is_info_panel_visible,
@@ -31,20 +36,33 @@ const InfoPanel = observer(() => {
 
     const handleClose = () => {
         setInfoPanelVisibility(false);
+        setIsTourOpen(false);
         localStorage.setItem('dbot_should_show_info', JSON.stringify(Date.now()));
     };
+
+    React.useEffect(() => {
+        if (is_tnc_needed) {
+            setIsTourOpen(false);
+        } else {
+            if (is_info_panel_visible) {
+                setIsTourOpen(true);
+            } else {
+                setIsTourOpen(false);
+            }
+        }
+    }, [is_tnc_needed, is_info_panel_visible]);
 
     const renderInfo = () => (
         <div className='db-info-panel'>
             <div data-testid='close-icon' className='db-info-panel__close-action' onClick={handleClose}>
-                <Icon width='1rem' height='1rem' icon='IcCloseIconDbot' />
+                <LegacyClose1pxIcon height='18px' width='18px' fill='var(--text-prominent)' />
             </div>
 
-            {SIDEBAR_INTRO.map(sidebar_item => {
+            {SIDEBAR_INTRO().map(sidebar_item => {
                 const { label, content, link } = sidebar_item;
                 return (
                     <div key={`${label}-${content}`}>
-                        <Text color='prominent' line_height='xxl' size={is_desktop ? 'm' : 's'} weight='bold' as='h1'>
+                        <Text color='prominent' lineHeight='xxl' size={isDesktop ? 'm' : 's'} weight='bold' as='h1'>
                             {label}
                         </Text>
                         {content.map(text => (
@@ -54,10 +72,10 @@ const InfoPanel = observer(() => {
                                     'db-info-panel__content': link,
                                 })}
                                 color='prominent'
-                                line_height='xl'
+                                lineHeight='xl'
                                 as='p'
                                 onClick={() => switchTab(link, label, text.faq_id)}
-                                size={is_desktop ? 's' : 'xxs'}
+                                size={isDesktop ? 's' : 'xxs'}
                             >
                                 {text.data}
                             </Text>
@@ -68,7 +86,7 @@ const InfoPanel = observer(() => {
         </div>
     );
 
-    return is_desktop ? (
+    return isDesktop ? (
         !active_tour && (
             <div
                 className={classNames('tab__dashboard__info-panel', {
@@ -81,7 +99,7 @@ const InfoPanel = observer(() => {
     ) : (
         <Modal
             className='statistics__modal statistics__modal--mobile'
-            is_open={is_info_panel_visible}
+            is_open={is_tour_open}
             toggleModal={handleClose}
             width={'440px'}
         >

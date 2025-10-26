@@ -86,7 +86,6 @@ export type TJournalDataListArgs = {
     is_new_row: boolean;
     is_scrolling: boolean;
     measure: () => void;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     passthrough?: any;
     row: TFilterMessageValues;
 };

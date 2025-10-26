@@ -1,8 +1,8 @@
-import { load, save_types } from '@deriv/bot-skeleton';
+import { load, save_types } from '@/external/bot-skeleton';
 import { ANNOUNCEMENTS, BUTTON_ACTION_TYPE, TAnnouncement, TAnnouncementItem } from '../config';
 
 export const handleOnConfirmAccumulator = () => {
-    import(/* webpackChunkName: `[request]` */ '@deriv/bot-skeleton/src/scratch/xml/main.xml')
+    import(/* webpackChunkName: `[request]` */ '@/external/bot-skeleton/scratch/xml/main.xml')
         .then(strategy_xml => {
             const strategy_dom = Blockly.utils.xml.textToDom(strategy_xml.default);
             const modifyFieldDropdownValues = (name: string, value: string) => {

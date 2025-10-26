@@ -1,14 +1,14 @@
 import React from 'react';
 import classnames from 'classnames';
-import { Icon } from '@deriv/components';
-import { observer } from '@deriv/stores';
-import { Localize } from '@deriv/translations';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '@/hooks/useStore';
+import { DerivLightDeclinedPoaIcon } from '@deriv/quill-icons';
+import { Localize } from '@deriv-com/translations';
 import RecentWorkspace from './recent-workspace';
 import WorkspaceControl from './workspace-control';
 
 const RecentComponent = observer(() => {
-    const { load_modal } = useDBotStore();
+    const { load_modal } = useStore();
     const { is_explanation_expand, recent_strategies, toggleExplanationExpand } = load_modal;
     if (recent_strategies.length) {
         return (
@@ -36,7 +36,9 @@ const RecentComponent = observer(() => {
     return (
         <div className='load-strategy__container'>
             <div className='load-strategy__recent__empty' data-testid='dt-load-strategy__recent__empty'>
-                <Icon icon='IcEmptyFolder' className='load-strategy__recent__empty-icon' size={128} />
+                <div className='load-strategy__recent__empty-icon'>
+                    <DerivLightDeclinedPoaIcon height='128px' width='128px' />
+                </div>
                 <div className='load-strategy__recent__empty-title'>
                     <Localize i18n_default_text='You do not have any recent bots' />
                 </div>

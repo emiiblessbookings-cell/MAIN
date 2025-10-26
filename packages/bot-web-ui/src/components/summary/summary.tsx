@@ -1,8 +1,8 @@
-import React from 'react';
 import classnames from 'classnames';
-import { ThemedScrollbars } from '@deriv/components';
-import { observer, useStore } from '@deriv/stores';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '@/hooks/useStore';
+import { useDevice } from '@deriv-com/ui';
+import ThemedScrollbars from '../shared_ui/themed-scrollbars';
 import SummaryCard from './summary-card';
 
 type TSummary = {
@@ -10,17 +10,16 @@ type TSummary = {
 };
 
 const Summary = observer(({ is_drawer_open }: TSummary) => {
-    const { ui } = useStore();
-    const { dashboard, summary_card } = useDBotStore();
+    const { dashboard, summary_card } = useStore();
     const { is_contract_loading, contract_info, is_bot_running } = summary_card;
     const { active_tour } = dashboard;
-    const { is_desktop } = ui;
+    const { isDesktop } = useDevice();
     return (
         <div
             className={classnames({
-                'run-panel-tab__content': is_desktop,
-                'run-panel-tab__content--mobile': !is_desktop && is_drawer_open,
-                'run-panel-tab__content--summary-tab': (is_desktop && is_drawer_open) || active_tour,
+                'run-panel-tab__content': isDesktop,
+                'run-panel-tab__content--mobile': !isDesktop && is_drawer_open,
+                'run-panel-tab__content--summary-tab': (isDesktop && is_drawer_open) || active_tour,
             })}
             data-testid='mock-summary'
         >
@@ -28,7 +27,7 @@ const Summary = observer(({ is_drawer_open }: TSummary) => {
                 className={classnames({
                     summary: (!is_contract_loading && !contract_info) || is_bot_running,
                     'summary--loading':
-                        (!is_desktop && is_contract_loading) || (!is_desktop && !is_contract_loading && contract_info),
+                        (!isDesktop && is_contract_loading) || (!isDesktop && !is_contract_loading && contract_info),
                 })}
             >
                 <SummaryCard

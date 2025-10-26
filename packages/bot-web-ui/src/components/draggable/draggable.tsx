@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Icon } from '@deriv/components';
+import { LegacyClose1pxIcon } from '@deriv/quill-icons/Legacy';
 import {
     calculateHeight,
     calculateWidth,
@@ -70,7 +70,6 @@ const Draggable: React.FC<TDraggableProps> = ({
         const initialSelfBottom = draggableRef.current?.getBoundingClientRect()?.bottom ?? size.height;
 
         let previousStyle = {};
-        let previousPointerEvent = 'unset';
         const draggableContentBody = draggableRef.current?.querySelector(
             '#draggable-content-body'
         ) as HTMLElement | null;
@@ -79,7 +78,6 @@ const Draggable: React.FC<TDraggableProps> = ({
             const { style } = draggableContentBody;
             if (style && style.pointerEvents !== 'none') {
                 previousStyle = { ...style };
-                previousPointerEvent = style.pointerEvents;
                 style.pointerEvents = 'none';
             }
         }
@@ -181,9 +179,8 @@ const Draggable: React.FC<TDraggableProps> = ({
                 try {
                     Object.assign(draggableContentBody.style, previousStyle);
                 } catch {
-                    // no need to handle this error
+                    draggableContentBody.style.pointerEvents = 'unset';
                 }
-                draggableContentBody.style.pointerEvents = previousPointerEvent ?? 'unset';
             }
             if (boundaryRef) {
                 window.removeEventListener('mousemove', handleMouseMove);
@@ -200,12 +197,7 @@ const Draggable: React.FC<TDraggableProps> = ({
     return (
         <div
             className={`draggable ${isDragging ? 'dragging' : ''}`}
-            style={{
-                position: 'absolute',
-                top: typeof position.y === 'number' ? position.y : 0,
-                left: typeof position.x === 'number' ? position.x : 0,
-                zIndex: typeof zIndex === 'number' ? zIndex : 0,
-            }}
+            style={{ position: 'absolute', top: position.y, left: position.x, zIndex }}
             onMouseDown={() => calculateZindex({ setZIndex })}
             onKeyDown={() => calculateZindex({ setZIndex })}
             data-testid='dt_react_draggable'
@@ -215,10 +207,7 @@ const Draggable: React.FC<TDraggableProps> = ({
                 ref={draggableRef}
                 className='draggable-content'
                 data-testid='dt_react_draggable_content'
-                style={{
-                    width: typeof size.width === 'number' ? size.width : 0,
-                    height: typeof size.height === 'number' ? size.height : 0,
-                }}
+                style={{ width: size.width, height: size.height }}
             >
                 <div
                     id='draggable-content__header'
@@ -236,7 +225,12 @@ const Draggable: React.FC<TDraggableProps> = ({
                         data-testid='dt_react_draggable-close-modal'
                         onClick={onClose}
                     >
-                        <Icon icon='IcCross' />
+                        <LegacyClose1pxIcon
+                            height='20px'
+                            width='20px'
+                            fill='var(--text-general)'
+                            className='icon-general-fill-path'
+                        />
                     </div>
                 </div>
                 <span className='draggable-content__body' id='draggable-content-body'>

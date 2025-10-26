@@ -1,29 +1,33 @@
 import React from 'react';
 import classNames from 'classnames';
-import { observer, useStore } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import { botNotification } from 'Components/bot-notification/bot-notification';
-import { notification_message } from 'Components/bot-notification/bot-notification-utils';
+import { observer } from 'mobx-react-lite';
+import { botNotification } from '@/components/bot-notification/bot-notification';
+import { notification_message } from '@/components/bot-notification/bot-notification-utils';
+import { useStore } from '@/hooks/useStore';
+import { localize } from '@deriv-com/translations';
+import { useDevice } from '@deriv-com/ui';
 import { TBlocklyEvents } from 'Types';
 import LoadModal from '../../components/load-modal';
-import { useDBotStore } from '../../stores/useDBotStore';
-import SaveModal from '../dashboard/bot-list/save-modal/save-modal';
+import SaveModal from '../dashboard/bot-list/save-modal';
 import BotBuilderTourHandler from '../tutorials/dbot-tours/bot-builder-tour';
 import QuickStrategy1 from './quick-strategy';
 import WorkspaceWrapper from './workspace-wrapper';
 
 const BotBuilder = observer(() => {
-    const { ui } = useStore();
-    const { dashboard, app, run_panel, toolbar, quick_strategy, blockly_store } = useDBotStore();
+    const { dashboard, app, run_panel, toolbar, quick_strategy, blockly_store } = useStore();
     const { active_tab, active_tour, is_preview_on_popup } = dashboard;
     const { is_open } = quick_strategy;
     const { is_running } = run_panel;
     const { is_loading } = blockly_store;
     const is_blockly_listener_registered = React.useRef(false);
     const is_blockly_delete_listener_registered = React.useRef(false);
-    const { is_desktop } = ui;
+    const { isDesktop } = useDevice();
     const { onMount, onUnmount } = app;
     const el_ref = React.useRef<HTMLInputElement | null>(null);
+
+    // TODO: fix
+    // const isMounted = useIsMounted();
+    // const { data: remote_config_data } = useRemoteConfig(isMounted());
     let deleted_block_id: null | string = null;
 
     React.useEffect(() => {
@@ -51,7 +55,7 @@ const BotBuilder = observer(() => {
     const handleBlockChangeOnBotRun = (e: Event) => {
         const { is_reset_button_clicked } = toolbar;
         if (e.type !== 'selected' && !is_reset_button_clicked) {
-            botNotification(notification_message.workspace_change);
+            botNotification(notification_message().workspace_change);
             removeBlockChangeListener();
         } else if (is_reset_button_clicked) {
             removeBlockChangeListener();
@@ -62,7 +66,6 @@ const BotBuilder = observer(() => {
         is_blockly_listener_registered.current = false;
         window.Blockly?.derivWorkspace?.removeChangeListener(handleBlockChangeOnBotRun);
     };
-
     React.useEffect(() => {
         const workspace = window.Blockly?.derivWorkspace;
         if (workspace && !is_blockly_delete_listener_registered.current) {
@@ -75,11 +78,16 @@ const BotBuilder = observer(() => {
 
     const handleBlockDelete = (e: TBlocklyEvents) => {
         const { is_reset_button_clicked, setResetButtonState } = toolbar;
+        if (e.type === 'undo') {
+            deleted_block_id = null;
+            return;
+        }
         if (e.type === 'delete' && !is_reset_button_clicked) {
             deleted_block_id = e.blockId;
         }
         if (e.type === 'selected' && deleted_block_id === e.oldElementId) {
             handleBlockDeleteNotification();
+            deleted_block_id = null;
         }
         if (
             e.type === 'change' &&
@@ -92,7 +100,7 @@ const BotBuilder = observer(() => {
     };
 
     const handleBlockDeleteNotification = () => {
-        botNotification(notification_message.block_delete, {
+        botNotification(notification_message().block_delete, {
             label: localize('Undo'),
             onClick: closeToast => {
                 window.Blockly.derivWorkspace.undo();
@@ -110,13 +118,11 @@ const BotBuilder = observer(() => {
                     'bot-builder--tour-active': active_tour,
                 })}
             >
-                {is_preview_on_popup ? null : (
-                    <div id='scratch_div' ref={el_ref}>
-                        <WorkspaceWrapper />
-                    </div>
-                )}
+                <div id='scratch_div' ref={el_ref}>
+                    <WorkspaceWrapper />
+                </div>
             </div>
-            {active_tab === 1 && <BotBuilderTourHandler is_mobile={!is_desktop} />}
+            {active_tab === 1 && <BotBuilderTourHandler is_mobile={!isDesktop} />}
             {/* removed this outside from toolbar becuase it needs to loaded seperately without dependency */}
             <LoadModal />
             <SaveModal />

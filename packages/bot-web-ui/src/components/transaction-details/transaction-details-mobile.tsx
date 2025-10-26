@@ -1,17 +1,16 @@
-import React from 'react';
-import { MobileFullPageModal } from '@deriv/components';
-import { observer, useStore } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import { StatisticsSummary } from 'Components/run-panel/run-panel';
-import { transaction_elements } from 'Constants/transactions';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import { StatisticsSummary } from '@/components/run-panel/run-panel';
+import { transaction_elements } from '@/constants/transactions';
+import { useStore } from '@/hooks/useStore';
+import { localize } from '@deriv-com/translations';
+import MobileFullPageModal from '../shared_ui/mobile-full-page-modal';
 import MobileTransactionCards from './mobile-transaction-card';
 import { TRunPanelStore } from './transaction-details.types';
 import './transaction-details-mobile.scss';
 
 const TransactionDetailsMobile = observer(() => {
     const { client } = useStore();
-    const { transactions, run_panel } = useDBotStore();
+    const { transactions, run_panel } = useStore();
     const {
         toggleTransactionDetailsModal,
         is_transaction_details_modal_open,

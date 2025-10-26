@@ -1,27 +1,25 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Text } from '@deriv/components';
-import { observer, useStore } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import Text from '@/components/shared_ui/text';
+import { useStore } from '@/hooks/useStore';
+import { localize } from '@deriv-com/translations';
+import { useDevice } from '@deriv-com/ui';
 import OnboardTourHandler from '../tutorials/dbot-tours/onboarding-tour';
+import Announcements from './announcements';
 import Cards from './cards';
 import InfoPanel from './info-panel';
-import Announcements from './announcements/announcements';
-import NewsPanel from './news-panel';
-import WithdrawalToaster from './withdrawal-toaster';
 
 type TMobileIconGuide = {
     handleTabChange: (active_number: number) => void;
 };
 
 const DashboardComponent = observer(({ handleTabChange }: TMobileIconGuide) => {
-    const { ui } = useStore();
-    const { load_modal, dashboard } = useDBotStore();
+    const { load_modal, dashboard } = useStore();
     const { dashboard_strategies } = load_modal;
     const { active_tab, active_tour } = dashboard;
     const has_dashboard_strategies = !!dashboard_strategies?.length;
-    const { is_desktop, is_tablet } = ui;
+    const { isDesktop, isTablet } = useDevice();
 
     return (
         <React.Fragment>
@@ -31,11 +29,11 @@ const DashboardComponent = observer(({ handleTabChange }: TMobileIconGuide) => {
                 })}
             >
                 <div className='tab__dashboard__content'>
-                    <Announcements is_mobile={!is_desktop} is_tablet={is_tablet} handleTabChange={handleTabChange} />
+                    <Announcements is_mobile={!isDesktop} is_tablet={isTablet} handleTabChange={handleTabChange} />
                     <div className='quick-panel'>
                         <div
                             className={classNames('tab__dashboard__header', {
-                                'tab__dashboard__header--listed': is_desktop && has_dashboard_strategies,
+                                'tab__dashboard__header--listed': isDesktop && has_dashboard_strategies,
                             })}
                         >
                             {!has_dashboard_strategies && (
@@ -43,8 +41,8 @@ const DashboardComponent = observer(({ handleTabChange }: TMobileIconGuide) => {
                                     className='title'
                                     as='h2'
                                     color='prominent'
-                                    size={is_desktop ? 'sm' : 's'}
-                                    line_height='xxl'
+                                    size={isDesktop ? 'sm' : 's'}
+                                    lineHeight='xxl'
                                     weight='bold'
                                 >
                                     {localize('Load or build your bot')}
@@ -53,8 +51,8 @@ const DashboardComponent = observer(({ handleTabChange }: TMobileIconGuide) => {
                             <Text
                                 as='p'
                                 color='prominent'
-                                line_height='s'
-                                size={is_desktop ? 's' : 'xxs'}
+                                lineHeight='s'
+                                size={isDesktop ? 's' : 'xxs'}
                                 className={classNames('subtitle', { 'subtitle__has-list': has_dashboard_strategies })}
                             >
                                 {localize(
@@ -62,15 +60,12 @@ const DashboardComponent = observer(({ handleTabChange }: TMobileIconGuide) => {
                                 )}
                             </Text>
                         </div>
-                        <Cards has_dashboard_strategies={has_dashboard_strategies} is_mobile={!is_desktop}>
-                            <NewsPanel />
-                        </Cards>
+                        <Cards has_dashboard_strategies={has_dashboard_strategies} is_mobile={!isDesktop} />
                     </div>
                 </div>
             </div>
             <InfoPanel />
-            {active_tab === 0 && <OnboardTourHandler is_mobile={!is_desktop} />}
-            <WithdrawalToaster />
+            {active_tab === 0 && <OnboardTourHandler is_mobile={!isDesktop} />}
         </React.Fragment>
     );
 });

@@ -1,3 +1,6 @@
+@use 'components/shared/styles/constants' as *;
+@use 'components/shared/styles/mixins' as *;
+
 .toolbar {
     height: 5.6rem;
     display: flex;
@@ -8,6 +11,7 @@
     top: 0;
     inset-inline-start: 23.2rem;
     background-color: var(--general-main-1);
+    z-index: 1;
 
     @include mobile-or-tablet-screen {
         height: 64px;
@@ -17,15 +21,15 @@
         overflow-x: auto;
         width: fit-content;
         padding: 0;
+        scrollbar-width: none;
+        z-index: 0;
+        -ms-overflow-style: none;
+
         &::-webkit-scrollbar {
             display: none;
         }
-
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-        z-index: 0;
     }
-    z-index: 1;
+
     &__btn {
         background-color: var(--button-primary-default) !important;
 
@@ -33,6 +37,7 @@
             display: flex;
             justify-content: center;
             height: calc(5.6rem - 1.6rem) !important;
+
             @include desktop-screen {
                 width: 22rem;
                 margin-bottom: 1rem;
@@ -41,14 +46,17 @@
             & .dc-btn__icon {
                 padding-right: 0.4rem;
             }
+
             > * {
                 align-self: center;
             }
+
             &-text {
                 @include typeface(--title-center-bold-active, none);
             }
         }
     }
+
     &__section {
         display: flex;
 
@@ -68,6 +76,7 @@
             }
         }
     }
+
     &__icon {
         cursor: pointer;
         border: none;
@@ -80,47 +89,58 @@
             margin: 1.2rem;
         }
     }
+
     &__group {
         display: flex;
         border-radius: $BORDER_RADIUS;
         border: solid 1px var(--border-normal);
         height: 4rem;
+
         &-btn {
             padding: 0 1.2rem;
             height: 4rem;
+
             @include mobile-or-tablet-screen {
                 padding: 0;
                 height: fit-content;
                 flex-direction: column;
                 border: none;
+
                 .dc-popover {
                     &__target {
                         width: 4rem;
+                        height: 4rem;
                     }
                 }
             }
+
             > * {
                 align-self: center;
             }
         }
     }
+
     &__animation {
         width: 35rem;
     }
+
     &__dialog {
         &-text--second {
             margin-top: 2.4rem;
         }
     }
+
     &__wrapper {
         @include mobile-or-tablet-screen {
             background-color: var(--general-main-1);
             position: absolute;
-            top: 0;
+            top: 10;
             overflow-y: auto;
             scrollbar-width: none;
             height: calc(100% - 5rem);
-            box-shadow: 0 1.2rem 1.6rem rgba(14, 14, 14, 0.08), 0 0.4rem 0.6rem rgba(14, 14, 14, 0.03);
+            box-shadow:
+                0 1.2rem 1.6rem rgb(14 14 14 / 8%),
+                0 0.4rem 0.6rem rgb(14 14 14 / 3%);
         }
     }
 }
@@ -129,6 +149,7 @@
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }

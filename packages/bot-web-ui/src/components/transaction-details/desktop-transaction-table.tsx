@@ -1,11 +1,13 @@
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
 import classNames from 'classnames';
 import ContentLoader from 'react-content-loader';
-import { getContractTypeName } from '@deriv/bot-skeleton';
-import { isDbotRTL } from '@deriv/bot-skeleton/src/utils/workspace';
-import { Icon, IconTradeTypes, Popover } from '@deriv/components';
-import { convertDateFormat } from '@deriv/shared';
-import { transaction_elements } from 'Constants/transactions';
+import { transaction_elements } from '@/constants/transactions';
+import { getContractTypeName } from '@/external/bot-skeleton';
+import { isDbotRTL } from '@/external/bot-skeleton/utils/workspace';
+import { MarketIcon } from '../market/market-icon';
+import { convertDateFormat } from '../shared';
+import Popover from '../shared_ui/popover';
+import { TradeTypeIcon } from '../trade-type/trade-type-icon';
 import { TColumn, TDesktopTransactionTable, TTableCell } from './transaction-details.types';
 
 const PARENT_CLASS = 'transaction-details-modal-desktop';
@@ -94,7 +96,7 @@ export default function DesktopTransactionTable({
                                     label={
                                         <IconWrapper
                                             message={data?.display_name}
-                                            icon={<Icon icon={`IcUnderlying${data?.underlying}`} size={24} />}
+                                            icon={<MarketIcon type={data?.underlying} size='sm' />}
                                         />
                                     }
                                 />
@@ -102,7 +104,7 @@ export default function DesktopTransactionTable({
                                     label={
                                         <IconWrapper
                                             message={getContractTypeName(data)}
-                                            icon={<IconTradeTypes type={data?.contract_type} size={24} />}
+                                            icon={<TradeTypeIcon type={data?.contract_type} size='sm' />}
                                         />
                                     }
                                 />

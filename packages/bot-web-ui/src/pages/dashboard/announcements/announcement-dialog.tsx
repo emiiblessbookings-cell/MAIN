@@ -1,5 +1,6 @@
 import React from 'react';
-import { Dialog, Text } from '@deriv/components';
+import Dialog from '@/components/shared_ui/dialog';
+import Text from '@/components/shared_ui/text';
 import { LabelPairedCheckCaptionFillIcon } from '@deriv/quill-icons';
 import { rudderStackSendCloseEvent } from '../../../analytics/rudderstack-common-events';
 import { IconAnnounceModal } from './announcement-components';
@@ -13,6 +14,8 @@ type TAccumulatorAnnouncementDialog = {
     handleOnConfirm: () => void;
     handleOnCancel: (() => void) | null;
     is_tablet?: boolean;
+    unordered_list?: TContentItem[];
+    media?: string[];
 };
 
 const AnnouncementDialog = ({
@@ -35,11 +38,10 @@ const AnnouncementDialog = ({
         plain_text,
         unordered_list,
         media,
-        event_name,
     } = announcement;
     return (
         <Dialog
-            portal_element_id='modal_root_absolute'
+            portal_element_id='modal_root'
             title={main_title}
             is_visible={is_announce_dialog_open}
             confirm_button_text={confirm_button_text}
@@ -52,7 +54,7 @@ const AnnouncementDialog = ({
                 setIsAnnounceDialogOpen(false);
                 rudderStackSendCloseEvent({
                     subform_name: 'announcements',
-                    announcement_name: event_name,
+                    announcement_name: main_title,
                 });
             }}
             className={is_tablet ? `${base_classname} ${base_classname}--tablet` : base_classname}
@@ -79,7 +81,7 @@ const AnnouncementDialog = ({
                                     <div>
                                         <LabelPairedCheckCaptionFillIcon fill='var(--icon-black-plus)' />
                                     </div>
-                                    <Text as='p' line_height='l' size='xs'>
+                                    <Text as='p' lineHeight='l' size='xs'>
                                         {content_item?.text}
                                     </Text>
                                 </div>
@@ -89,7 +91,7 @@ const AnnouncementDialog = ({
                         <ul className={`${base_classname}__unordered_list`} key={0}>
                             {unordered_list.map((content_item: TContentItem) => (
                                 <li key={content_item?.id}>
-                                    <Text as='p' line_height='l' size='xs'>
+                                    <Text as='div' lineHeight='l' size='xs'>
                                         {content_item?.text}
                                     </Text>
                                 </li>
@@ -101,7 +103,7 @@ const AnnouncementDialog = ({
                             {numbered_content.map((content: TContentItem) => (
                                 <Text
                                     as='li'
-                                    line_height='xl'
+                                    lineHeight='xl'
                                     size='xs'
                                     key={content?.id}
                                     styles={{ listStyle: 'auto' }}
@@ -116,7 +118,7 @@ const AnnouncementDialog = ({
                             {plain_text.map((plain_text_item: TContentItem) => (
                                 <span key={plain_text_item?.id}>
                                     <Text
-                                        line_height='m'
+                                        lineHeight='m'
                                         size='xs'
                                         key={plain_text_item.id}
                                         styles={{ listStyle: 'auto' }}

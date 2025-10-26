@@ -1,12 +1,12 @@
 import React from 'react';
 import classNames from 'classnames';
-import { useHistory } from 'react-router-dom';
-import { Text } from '@deriv/components';
+import { observer } from 'mobx-react-lite';
+import { useNavigate } from 'react-router-dom';
+import Text from '@/components/shared_ui/text';
+import { useStore } from '@/hooks/useStore';
 import { StandaloneBullhornRegularIcon } from '@deriv/quill-icons';
-import { observer } from '@deriv/stores';
-import { localize } from '@deriv/translations';
+import { localize } from '@deriv-com/translations';
 import { Notifications as Announcement } from '@deriv-com/ui';
-import { useDBotStore } from 'Stores/useDBotStore';
 import { rudderStackSendOpenEvent } from '../../../analytics/rudderstack-common-events';
 import {
     rudderStackSendAnnouncementActionEvent,
@@ -30,14 +30,15 @@ const Announcements = observer(({ is_mobile, is_tablet, handleTabChange }: TAnno
         load_modal: { toggleLoadModal },
         dashboard: { showVideoDialog },
         quick_strategy: { setFormVisibility },
-    } = useDBotStore();
+    } = useStore();
     const [is_announce_dialog_open, setIsAnnounceDialogOpen] = React.useState(false);
     const [is_open_announce_list, setIsOpenAnnounceList] = React.useState(false);
     const [selected_announcement, setSelectedAnnouncement] = React.useState<TAnnouncement | null>(null);
     const [read_announcements_map, setReadAnnouncementsMap] = React.useState({} as Record<string, boolean>);
     const [amount_active_announce, setAmountActiveAnnounce] = React.useState(0);
-    const history = useHistory();
+    const navigate = useNavigate();
     const [notifications, setNotifications] = React.useState([] as TNotifications[]);
+
     const action_button_class_name = 'announcements__label';
 
     const storeDataInLocalStorage = (updated_local_storage_data: Record<string, boolean>) => {
@@ -56,13 +57,13 @@ const Announcements = observer(({ is_mobile, is_tablet, handleTabChange }: TAnno
         setSelectedAnnouncement(announcement);
         setIsAnnounceDialogOpen(true);
         setIsOpenAnnounceList(prev => !prev);
-        rudderStackSendAnnouncementClickEvent({ announcement_name: announcement.announcement.event_name });
+        rudderStackSendAnnouncementClickEvent({ announcement_name: announcement.announcement.main_title });
         updateLocalStorage(announce_id);
     };
 
     const handleRedirect = (url: string) => () => {
-        if (history) {
-            history.push(url);
+        if (navigate) {
+            navigate(url);
         }
     };
 
@@ -76,9 +77,8 @@ const Announcements = observer(({ is_mobile, is_tablet, handleTabChange }: TAnno
             if (data && Object.hasOwn(data, item.id)) {
                 is_not_read = data[item.id];
             }
-
             tmp_notifications.push({
-                key: item.id,
+                id: item.id,
                 icon: <item.icon announce={is_not_read} />,
                 title: <TitleAnnounce title={item.title} announce={is_not_read} />,
                 message: <MessageAnnounce message={item.message} date={item.date} announce={is_not_read} />,
@@ -105,7 +105,7 @@ const Announcements = observer(({ is_mobile, is_tablet, handleTabChange }: TAnno
     }, [read_announcements_map]);
 
     const openAccumulatorsVideo = () => {
-        const accumulators_video = guide_content.find(guide_content => guide_content.id === 4);
+        const accumulators_video = guide_content().find(guide_content => guide_content.id === 4);
         if (accumulators_video) {
             showVideoDialog({ url: accumulators_video.url, type: 'url' });
         }
@@ -113,8 +113,8 @@ const Announcements = observer(({ is_mobile, is_tablet, handleTabChange }: TAnno
 
     const handleOnCancel = () => {
         rudderStackSendAnnouncementActionEvent({
-            announcement_name: selected_announcement?.announcement.event_name,
-            announcement_action: selected_announcement?.announcement?.event_action?.cancel_button_text,
+            announcement_name: selected_announcement?.announcement.main_title,
+            announcement_action: selected_announcement?.announcement.cancel_button_text,
         });
         if (selected_announcement?.switch_tab_on_cancel) {
             handleTabChange(selected_announcement.switch_tab_on_cancel);
@@ -128,8 +128,8 @@ const Announcements = observer(({ is_mobile, is_tablet, handleTabChange }: TAnno
 
     const handleOnConfirm = () => {
         rudderStackSendAnnouncementActionEvent({
-            announcement_name: selected_announcement?.announcement.event_name,
-            announcement_action: selected_announcement?.announcement?.event_action?.confirm_button_text,
+            announcement_name: selected_announcement?.announcement.main_title,
+            announcement_action: selected_announcement?.announcement.confirm_button_text,
         });
         if (selected_announcement?.switch_tab_on_confirm) {
             handleTabChange(selected_announcement.switch_tab_on_confirm);

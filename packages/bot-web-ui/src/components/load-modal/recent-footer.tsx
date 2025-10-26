@@ -1,12 +1,12 @@
 import React from 'react';
-import { Button } from '@deriv/components';
-import { observer } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import { NOTIFICATION_TYPE } from 'Components/bot-notification/bot-notification-utils';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import { NOTIFICATION_TYPE } from '@/components/bot-notification/bot-notification-utils';
+import { useStore } from '@/hooks/useStore';
+import { localize } from '@deriv-com/translations';
+import Button from '../shared_ui/button';
 
 const RecentFooter = observer(() => {
-    const { load_modal, dashboard } = useDBotStore();
+    const { load_modal, dashboard } = useStore();
     const { is_open_button_loading, is_open_button_disabled, loadStrategyOnBotBuilder, toggleLoadModal } = load_modal;
     const { setOpenSettings } = dashboard;
 

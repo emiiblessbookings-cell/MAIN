@@ -1,15 +1,18 @@
 import React from 'react';
 import classnames from 'classnames';
-import { CSSTransition } from 'react-transition-group';
-import { Button, DataList, Icon, Text, ThemedScrollbars } from '@deriv/components';
-import { useNewRowTransition } from '@deriv/shared';
-import { observer, useStore } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import Download from 'Components/download';
-import { TContractInfo } from 'Components/summary/summary-card.types';
-import { contract_stages } from 'Constants/contract-stage';
-import { transaction_elements } from 'Constants/transactions';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import Download from '@/components/download';
+import Button from '@/components/shared_ui/button';
+import DataList from '@/components/shared_ui/data-list';
+import Text from '@/components/shared_ui/text';
+import { TContractInfo } from '@/components/summary/summary-card.types';
+import { contract_stages } from '@/constants/contract-stage';
+import { transaction_elements } from '@/constants/transactions';
+import { useStore } from '@/hooks/useStore';
+import { DerivLightEmptyCardboardBoxIcon } from '@deriv/quill-icons/Illustration';
+import { Localize } from '@deriv-com/translations';
+import { useDevice } from '@deriv-com/ui';
+import ThemedScrollbars from '../shared_ui/themed-scrollbars';
 import Transaction from './transaction';
 
 type TTransactions = {
@@ -21,24 +24,20 @@ type TTransactionItem = {
         type: string;
         data: TContractInfo;
     };
-    is_new_row?: boolean;
     onClickTransaction?: (transaction_id: null | number) => void;
     active_transaction_id?: number | null;
 };
 
-const TransactionItem = ({ row, is_new_row = false, onClickTransaction, active_transaction_id }: TTransactionItem) => {
-    const { in_prop } = useNewRowTransition(is_new_row);
+const TransactionItem = ({ row = false, onClickTransaction, active_transaction_id }: TTransactionItem) => {
     switch (row.type) {
         case transaction_elements.CONTRACT: {
             const { data: contract } = row;
             return (
-                <CSSTransition in={in_prop} timeout={500} classNames='list__animation'>
-                    <Transaction
-                        contract={contract}
-                        onClickTransaction={onClickTransaction}
-                        active_transaction_id={active_transaction_id}
-                    />
-                </CSSTransition>
+                <Transaction
+                    contract={contract}
+                    onClickTransaction={onClickTransaction}
+                    active_transaction_id={active_transaction_id}
+                />
             );
         }
         case transaction_elements.DIVIDER: {
@@ -56,11 +55,10 @@ const TransactionItem = ({ row, is_new_row = false, onClickTransaction, active_t
 
 const Transactions = observer(({ is_drawer_open }: TTransactions) => {
     const [active_transaction_id, setActiveTransactionId] = React.useState<number | null>(null);
-    const { ui } = useStore();
-    const { run_panel, transactions } = useDBotStore();
+    const { run_panel, transactions } = useStore();
     const { contract_stage } = run_panel;
     const { transactions: transaction_list, toggleTransactionDetailsModal, recoverPendingContracts } = transactions;
-    const { is_desktop } = ui;
+    const { isDesktop } = useDevice();
 
     React.useEffect(() => {
         window.addEventListener('click', onClickOutsideTransaction);
@@ -100,8 +98,8 @@ const Transactions = observer(({ is_drawer_open }: TTransactions) => {
     return (
         <div
             className={classnames('transactions', {
-                'run-panel-tab__content': is_desktop,
-                'run-panel-tab__content--mobile': !is_desktop && is_drawer_open,
+                'run-panel-tab__content': isDesktop,
+                'run-panel-tab__content--mobile': !isDesktop && is_drawer_open,
             })}
         >
             <div className='download__container transaction-details__button-container'>
@@ -109,27 +107,30 @@ const Transactions = observer(({ is_drawer_open }: TTransactions) => {
                 <Button
                     id='download__container__view-detail-button'
                     className='download__container__view-detail-button'
-                    is_disabled={!transaction_list?.length}
-                    text={localize('View Detail')}
+                    disabled={!transaction_list?.length}
                     onClick={() => {
                         toggleTransactionDetailsModal(true);
                     }}
                     secondary
-                />
+                >
+                    <Localize i18n_default_text='View Detail' />
+                </Button>
             </div>
             <div className='transactions__header'>
-                <span className='transactions__header-column transactions__header-type'>{localize('Type')}</span>
+                <span className='transactions__header-column transactions__header-type'>
+                    <Localize i18n_default_text='Type' />
+                </span>
                 <span className='transactions__header-column transactions__header-spot'>
-                    {localize('Entry/Exit spot')}
+                    <Localize i18n_default_text='Entry/Exit spot' />
                 </span>
                 <span className='transactions__header-column transactions__header-profit'>
-                    {localize('Buy price and P/L')}
+                    <Localize i18n_default_text='Buy price and P/L' />
                 </span>
             </div>
             <div
                 className={classnames({
-                    transactions__content: is_desktop,
-                    'transactions__content--mobile': !is_desktop,
+                    transactions__content: isDesktop,
+                    'transactions__content--mobile': !isDesktop,
                 })}
             >
                 <div className='transactions__scrollbar'>
@@ -181,11 +182,12 @@ const Transactions = observer(({ is_drawer_open }: TTransactions) => {
                                     <div className='transactions-empty-box'>
                                         <div className='transactions-empty'>
                                             <div className='transactions-empty__icon-box'>
-                                                <Icon
-                                                    icon='IcBox'
-                                                    className='transactions-empty__icon'
-                                                    size={64}
+                                                <DerivLightEmptyCardboardBoxIcon
+                                                    height='64px'
+                                                    width='64px'
+                                                    className='transactions-empty__icon icon-general-fill-g-path'
                                                     color='secondary'
+                                                    fill='var(--text-general)'
                                                 />
                                             </div>
                                             <Text
@@ -194,18 +196,26 @@ const Transactions = observer(({ is_drawer_open }: TTransactions) => {
                                                 weight='bold'
                                                 align='center'
                                                 color='less-prominent'
-                                                line_height='xxs'
+                                                lineHeight='xxs'
                                                 className='transactions-empty__header'
                                             >
-                                                {localize('There are no transactions to display')}
+                                                <Localize i18n_default_text='There are no transactions to display' />
                                             </Text>
                                             <div className='transactions-empty__message'>
                                                 <Text size='xxs' color='less-prominent'>
-                                                    {localize('Here are the possible reasons:')}
+                                                    <Localize i18n_default_text='Here are the possible reasons:' />
                                                 </Text>
                                                 <ul className='transactions-empty__list'>
-                                                    <li>{localize('The bot is not running')}</li>
-                                                    <li>{localize('The stats are cleared')}</li>
+                                                    <li>
+                                                        <Text size='xs' color='less-prominent'>
+                                                            <Localize i18n_default_text='The bot is not running' />
+                                                        </Text>
+                                                    </li>
+                                                    <li>
+                                                        <Text size='xs' color='less-prominent'>
+                                                            <Localize i18n_default_text='The stats are cleared' />
+                                                        </Text>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </div>

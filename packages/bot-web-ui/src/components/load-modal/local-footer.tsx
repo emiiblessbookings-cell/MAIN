@@ -1,13 +1,13 @@
 import React from 'react';
-import { Button } from '@deriv/components';
-import { observer, useStore } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import { NOTIFICATION_TYPE } from 'Components/bot-notification/bot-notification-utils';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import { NOTIFICATION_TYPE } from '@/components/bot-notification/bot-notification-utils';
+import { useStore } from '@/hooks/useStore';
+import { localize } from '@deriv-com/translations';
+import { useDevice } from '@deriv-com/ui';
+import Button from '../shared_ui/button';
 
 const LocalFooter = observer(() => {
-    const { ui } = useStore();
-    const { load_modal, dashboard } = useDBotStore();
+    const { load_modal, dashboard } = useStore();
     const {
         is_open_button_loading,
         is_open_button_disabled,
@@ -17,13 +17,12 @@ const LocalFooter = observer(() => {
         toggleLoadModal,
     } = load_modal;
     const { setOpenSettings, setPreviewOnPopup } = dashboard;
-
-    const { is_desktop } = ui;
-    const Wrapper = is_desktop ? React.Fragment : Button.Group;
+    const { isDesktop } = useDevice();
+    const Wrapper = isDesktop ? React.Fragment : Button.Group;
 
     return (
         <Wrapper>
-            {!is_desktop && (
+            {!isDesktop && (
                 <Button text={localize('Cancel')} onClick={() => setLoadedLocalFile(null)} has_effect secondary large />
             )}
             <Button

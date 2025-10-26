@@ -1,0 +1,2365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unified Trading Bot Interface</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: orange;
+      --secondary-color: #00ff9d;
+      --dark-bg: #121212;
+      --darker-bg: #0a0a2e;
+      --card-bg: rgba(255, 255, 255, 0.1);
+      --text-color: white;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(45deg, var(--darker-bg), #1a1a3a);
+      color: var(--text-color);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    .tabs-container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px 10px 0 0;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+    
+    .tab {
+      padding: 15px 30px;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      text-align: center;
+      flex: 1;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    .tab.active {
+      background: var(--primary-color);
+      color: #000;
+    }
+    
+    .tab-content {
+      display: none;
+      background: var(--dark-bg);
+      border-radius: 0 0 10px 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Bot 1 Styles */
+    .bot1-container {
+      padding: 2rem;
+      display: flex;
+      flex-grow: 1;
+      gap: 4rem;
+      justify-content: space-between;
+      flex-direction: row;
+    }
+    
+    @media (max-width: 768px) {
+      .bot1-container {
+        flex-direction: column;
+      }
+    
+      .bot1-container .right-side {
+        order: -1;
+      }
+    }
+    
+    .bot1-container .form, .bot1-container .right-side {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .bot1-container .form .select-wrapper,
+    .bot1-container .form .input-wrapper {
+      position: relative;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .bot1-container .form input {
+      padding: 0.75rem;
+      border-radius: 3px;
+      background-color: #1f1f1f;
+      color: white;
+      box-shadow: 0 0 5px 0px var(--primary-color);
+      border: none;
+      width: 100%;
+      box-sizing: border-box;
+      padding-right: 4rem;
+    }
+    
+    .bot1-container .form input::placeholder {
+      color: #ccc;
+    }
+    
+    .bot1-container .form .input-wrapper .hint {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      font-size: 0.75rem;
+      pointer-events: none;
+    }
+    
+    .bot1-container .form select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      padding: 0.75rem;
+      padding-right: 2.5rem;
+      border-radius: 3px;
+      background-color: #1f1f1f;
+      color: white;
+      box-shadow: 0 0 5px 0px var(--primary-color);
+      border: none;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .bot1-container .select-wrapper::after {
+      content: "\25BC";
+      color: var(--primary-color);
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+    
+    .bot1-container .form select:focus,
+    .bot1-container .form input:focus {
+      outline: none;
+      box-shadow: 0 0 5px 0px var(--primary-color);
+    }
+    
+    .bot1-container .bot-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #1f1f1f;
+      padding: 1rem;
+      border-radius: 5px;
+      width: 100%;
+      box-shadow: 0 0 5px 0px var(--primary-color);
+    }
+    
+    .bot1-container .run-btn {
+      padding: 0.75rem;
+      background-color: var(--primary-color);
+      color: #121212;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    
+    .bot1-container .status-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+    
+    .bot1-container .status-container .status {
+      font-style: italic;
+      color: #aaa;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    
+    .bot1-container .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: gray;
+      z-index: 2;
+      margin: 0 5px;
+    }
+    
+    .bot1-container .active {
+      background-color: var(--primary-color);
+    }
+    
+    .bot1-container .table-container {
+      width: 100%;
+      margin-top: 1rem;
+      border-radius: 0 0 5px 5px;
+      overflow: hidden;
+      box-shadow: 0 0 5px 0px var(--primary-color);
+      max-height: 190px;
+      min-height: 190px;
+      overflow-y: auto;
+    }
+    
+    .bot1-container thead th {
+      position: sticky;
+      top: 0;
+      background-color: var(--primary-color);
+      color: white;
+      z-index: 2;
+    }
+    
+    .bot1-container table {
+      width: 100%;
+      border-collapse: separate;
+      background-color: #1f1f1f;
+      border: 1px solid #333;
+      font-size: 0.8rem;
+    }
+    
+    .bot1-container th, .bot1-container td {
+      padding: 0.5rem;
+      text-align: left;
+      border-bottom: 1px solid #333;
+    }
+    
+    .bot1-container th {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .bot1-container .summary {
+      margin-top: 1rem;
+      background-color: #1f1f1f;
+      padding: 1rem;
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      border-radius: 5px;
+      box-shadow: 0 0 0px 0px var(--primary-color);
+    }
+    
+    .bot1-container .summary div {
+      padding: 0.15rem;
+      font-size: 0.5rem;
+      color: white;
+      border-radius: 5px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 5px 0px var(--primary-color);
+      transition: box-shadow 0.3s ease-in-out;
+    }
+    
+    .bot1-container .summary div:hover {
+      box-shadow: 0 0 5px 0px var(--primary-color);
+    }
+    
+    .bot1-container .total-stake {
+      background-color: blue;
+      box-shadow: 0 0 5px 0px blue;
+      padding: 0;
+      font-size: 0.625rem;
+    }
+    
+    .bot1-container .total-won {
+      background-color: green;
+      box-shadow: 0 0 5px 0px green;
+    }
+    
+    .bot1-container .total-lost {
+      background-color: red;
+      box-shadow: 0 0 5px 0px red;
+    }
+    
+    .bot1-container .profit-loss {
+      background-color: blue;
+      box-shadow: 0 0 5px 0px blue;
+    }
+    
+    .bot1-container .dot-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+    
+    .bot1-container .dots-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      position: relative;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .bot1-container .dots-container::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: calc(16.66% + 5px);
+      right: calc(16.66% + 5px);
+      height: 1px;
+      background-color: gray;
+      z-index: 0;
+      transform: translateY(-50%);
+    }
+    
+    .bot1-container .dots-container::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: calc(16.66% + 5px);
+      right: var(--progress-right, calc(50% + 5px));
+      height: 1px;
+      background-color: var(--primary-color);
+      z-index: 1;
+      transform: translateY(-50%);
+    }
+    
+    .bot1-container .right-side .status-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .bot1-container .bot-status-container {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    
+    .bot1-container .bot-status-container .status {
+      margin-left: 1rem;
+    }
+    
+    .bot1-container .glow {
+      animation: glowPulse 0.5s infinite ease-in-out;
+      box-shadow: 0 0 5px #00ffcc;
+    }
+    
+    @keyframes glowPulse {
+      0% {
+        box-shadow: 0 0 5px #00ffcc;
+        opacity: 1;
+      }
+      50% {
+        box-shadow: 0 0 20px #00ffcc;
+        opacity: 0.4;
+      }
+      100% {
+        box-shadow: 0 0 5px #00ffcc;
+        opacity: 1;
+      }
+    }
+    
+    .bot1-container .right-side {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+    }
+    
+    .bot1-container .right-side .dots-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+    
+    .bot1-container .summary .label {
+      font-size: 0.75rem;
+    }
+    
+    .bot1-container .summary .amount {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+    
+    @media (max-width: 600px) {
+      .bot1-container .summary .label {
+        font-size: 10px;
+      }
+    
+      .bot1-container .summary .amount {
+        font-size: 15px;
+      }
+    }
+    
+    /* Bot 2 Styles */
+    .bot2-container {
+      padding: 20px;
+      height: calc(100vh - 120px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+    
+    .bot2-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .bot2-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .bot2-container::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+    
+    .bot2-container::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bot2-main-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+    }
+    
+    @media (min-width: 768px) {
+      .bot2-main-container {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+    }
+    
+    .bot2-analysis-container {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      width: 100%;
+      max-width: 600px;
+    }
+    
+    .bot2-form-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      width: 100%;
+      max-width: 400px;
+    }
+    
+    .bot2-results-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      width: 100%;
+      margin-top: 20px;
+    }
+    
+    .bot2-container #digit-display-container {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 15px;
+      padding: 5px;
+      justify-items: center;
+      margin: 0 auto;
+    }
+    
+    .bot2-container .digit-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .bot2-container .digit-box {
+      width: 45px;
+      height: 45px;
+      border: 5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      font-weight: bold;
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+    
+    .bot2-container .digit-box:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    }
+    
+    .bot2-container .digit-percentage {
+      font-size: 12px;
+      color: #88ccff;
+      margin-top: 8px;
+    }
+    
+    .bot2-container .highest {
+      background: linear-gradient(145deg, var(--secondary-color), #00cc7d);
+      border: none;
+      box-shadow: 0 0 15px rgba(0, 255, 157, 0.5);
+    }
+    
+    .bot2-container .lowest {
+      background: linear-gradient(145deg, #ff5555, #cc4444);
+      border: none;
+      box-shadow: 0 0 15px rgba(255, 85, 85, 0.5);
+    }
+    
+    .bot2-container .current {
+      position: relative;
+    }
+    
+    .bot2-container .arrow {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid #ffd700;
+      filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+    }
+    
+    .bot2-container #current-price {
+      font-size: 32px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 20px;
+      color: var(--secondary-color);
+      text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+      display: block;
+    }
+    
+    .bot2-container input, .bot2-container select {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      margin-top: 8px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .bot2-container input:focus, .bot2-container select:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
+    }
+    
+    .bot2-container input:hover, .bot2-container select:hover {
+      border-color: #88ccff;
+      box-shadow: 0 0 10px rgba(136, 204, 255, 0.2);
+    }
+    
+    .bot2-container select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2388ccff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+    
+    .bot2-container select option {
+      background: #1a1a3a;
+      color: #fff;
+      padding: 12px;
+    }
+    
+    .bot2-container button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(45deg, var(--secondary-color), #00cc7d);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .bot2-container button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 255, 157, 0.4);
+    }
+    
+    .bot2-container h2, .bot2-container h3 {
+      color: #fff;
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    
+    .bot2-container label {
+      color: #88ccff;
+      font-size: 14px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    
+    .bot2-container .form-group {
+      margin-bottom: 25px;
+      position: relative;
+    }
+    
+    .bot2-container .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .bot2-container .notification.success {
+      background: linear-gradient(145deg, var(--secondary-color), #00cc7d);
+      box-shadow: 0 4px 15px rgba(0, 255, 157, 0.3);
+    }
+    
+    .bot2-container .notification.error {
+      background: linear-gradient(145deg, #ff5555, #cc4444);
+      box-shadow: 0 4px 15px rgba(255, 85, 85, 0.3);
+    }
+    
+    .bot2-container .notification.info {
+      background: linear-gradient(145deg, #3498db, #2980b9);
+      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+    
+    .bot2-container .trade-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      text-align: center;
+    }
+    
+    .bot2-container .trade-stats .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+    }
+    
+    .bot2-container .trade-stats .stat-label {
+      font-size: 12px;
+      color: #88ccff;
+      margin-bottom: 5px;
+    }
+    
+    .bot2-container .trade-stats .stat-value {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    
+    .bot2-container .trade-stats .positive {
+      color: var(--secondary-color);
+    }
+    
+    .bot2-container .trade-stats .negative {
+      color: #ff5555;
+    }
+    
+    .bot2-container .trade-results {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .bot2-container .trade-results .no-trades {
+      text-align: center;
+      padding: 20px;
+      color: #88ccff;
+      font-style: italic;
+    }
+    
+    .bot2-container .trade-result {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      margin-bottom: 5px;
+    }
+    
+    .bot2-container .trade-details {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      font-size: 14px;
+    }
+    
+    .bot2-container .trade-profit {
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    
+    .bot2-container .trade-result.win .trade-profit {
+      background: rgba(0, 255, 157, 0.2);
+      color: var(--secondary-color);
+    }
+    
+    .bot2-container .trade-result.loss .trade-profit {
+      background: rgba(255, 85, 85, 0.2);
+      color: #ff5555;
+    }
+    
+    .bot2-container .fullscreen-btn {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background-color: #fff;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .bot2-container .fullscreen-btn svg {
+      fill: #000;
+    }
+    
+    .bot2-container .trade-button-container {
+      margin-top: 20px;
+      text-align: center;
+    }
+    
+    .bot2-container #ws-status {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-left: 8px;
+      transition: background-color 0.3s ease;
+      background-color: #f44336;
+    }
+    
+    .bot2-container #ws-status.connected {
+      background-color: #4CAF50;
+    }
+  </style>
+</head>
+<body>
+  <div class="tabs-container">
+    <div class="tabs">
+      <div class="tab active" data-tab="bot1">Auto AI Bot</div>
+      <div class="tab" data-tab="bot2">Over under Bot</div>
+    </div>
+    
+    <!-- Bot 1 Content -->
+    <div id="bot1" class="tab-content active">
+      <div class="bot1-container">
+        <div class="right-side">
+          <div class="bot-area">
+            <div class="bot-status-container">
+              <button class="run-btn" id="run-btn">Run</button>
+              <div class="status-container">
+                <div class="dots-container">
+                  <div class="dot-container"><div class="dot" id="dot1"></div></div>
+                  <div class="dot-container"><div class="dot" id="dot2"></div></div>
+                  <div class="dot-container"><div class="dot" id="dot3"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Asset</th>
+                    <th>Stake</th>
+                    <th>Payout</th>
+                  </tr>
+                </thead>
+                <tbody id="bot-table-body">
+                  <!-- Data will be injected here -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="summary">
+              <div class="total-stake">
+                <p class="label">Total Stake</p>
+                <p class="amount" id="total-stake">$0.00</p>
+              </div>
+              <div class="total-won">
+                <p class="label">Total Won</p>
+                <p class="amount" id="total-won">0</p>
+              </div>
+              <div class="total-lost">
+                <p class="label">Total Lost</p>
+                <p class="amount" id="total-lost">0</p>
+              </div>
+              <div class="profit-loss">
+                <p class="label">Profit/Loss</p>
+                <p class="amount" id="profit-loss">$0.00</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form">
+          <div class="select-wrapper">
+            <select id="market-select">
+                  <option selected disabled>Quote Name</option>
+                  <option value="R_10">Volatility 10 Index</option>
+                  <option value="R_25">Volatility 25 Index</option>
+                  <option value="R_50">Volatility 50 Index</option>
+                  <option value="R_75">Volatility 75 Index</option>
+                  <option value="R_100">Volatility 100 Index</option>
+                  <option value="1HZ10V">Volatility 10 (1s) Index</option>
+                  <option value="1HZ25V">Volatility 25 (1s) Index</option>
+                  <option value="1HZ50V">Volatility 50 (1s) Index</option>
+                  <option value="1HZ75V">Volatility 75 (1s) Index</option>
+                  <option value="1HZ100V">Volatility 100 (1s) Index</option>
+                  <option value="RDBULL">Bull Market Index</option>
+                  <option value="RDBEAR">Bear Market Index</option>
+            </select>
+          </div>
+          <div class="input-wrapper">
+            <input id="init-stake" type="text" placeholder="Initial Stake" value="1.00" />
+            <span class="hint">Initial stake</span>
+          </div>
+          <div class="input-wrapper">
+            <input id="tp" type="text" placeholder="Take Profit" value="20" />
+            <span class="hint">Take profit</span>
+          </div>
+          <div class="input-wrapper">
+            <input id="sl" type="text" placeholder="Stop Loss" value="20" />
+            <span class="hint">Stop loss</span>
+          </div>
+          <div class="input-wrapper">
+            <input id="plier" type="text" placeholder="Enter Multiplier" value="1.10" />
+            <span class="hint">Multiplier</span>
+          </div>
+          <div class="input-wrapper">
+            <input id="maxstake" type="text" placeholder="Max Stake" value="100" />
+            <span class="hint">Max stake</span>
+          </div>
+          <div class="input-wrapper">
+            <input id="maxruns" type="text" placeholder="Max Trade" value="1000" />
+            <span class="hint">Max Trades</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bot 2 Content -->
+    <div id="bot2" class="tab-content">
+      <div class="bot2-container">
+        <button id="fullscreen-btn" class="fullscreen-btn">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+          </svg>
+        </button>
+        
+        <div class="bot2-main-container">
+          <div class="bot2-analysis-container">
+            <p2 id="current-price">N/A</p2>
+            <div class="chart-section">
+              <h3>Last Digit Analysis</h3>
+              <div id="digit-display-container"></div>
+            </div>
+            
+            <div class="trade-button-container">
+              <button id="placeBulkTradeBtn">Place Bulk Trade</button>
+            </div>
+          </div>
+          
+          <div class="bot2-form-card">
+            <h2>Trading Input</h2>
+            <form id="tradingForm">
+              <div class="form-group">
+                <label for="stake">Stake Amount:</label>
+                <input type="number" id="stake" name="stake" min="0" step="0.01" value="1" required>
+              </div>
+              <div class="form-group">
+                <label for="underBarrier">Under Barrier:</label>
+                <input type="number" id="underBarrier" name="underBarrier" min="0" max="9" value="4" required>
+              </div>
+              <div class="form-group">
+                <label for="overBarrier">Over Barrier:</label>
+                <input type="number" id="overBarrier" name="overBarrier" min="0" max="9" value="5" required>
+              </div>
+              <div class="form-group">
+                <label for="symbol">Trading Symbol:</label>
+                <select id="symbol" name="symbol" required>
+                  <option value="R_10">Volatility 10 Index</option>
+                  <option value="1HZ10V">Volatility 10 (1s) Index</option>
+                  <option value="R_25">Volatility 25 Index</option>
+                  <option value="1HZ25V">Volatility 25 (1s) Index</option>
+                  <option value="R_50">Volatility 50 Index</option>
+                  <option value="1HZ50V">Volatility 50 (1s) Index</option>
+                  <option value="R_75">Volatility 75 Index</option>
+                  <option value="1HZ75V">Volatility 75 (1s) Index</option>
+                  <option value="R_100" selected>Volatility 100 Index</option>
+                  <option value="1HZ100V">Volatility 100 (1s) Index</option>
+                  <option value="JD10">Jump 10 Index</option>
+                  <option value="JD25">Jump 25 Index</option>
+                  <option value="JD50">Jump 50 Index</option>
+                  <option value="JD75">Jump 75 Index</option>
+                  <option value="JD100">Jump 100 Index</option>
+                </select>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        <div class="bot2-results-card">
+          <h2>Trading Results</h2>
+          <div id="trade-stats" class="trade-stats"></div>
+          <div id="trade-results" class="trade-results"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching functionality
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs and content
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab and corresponding content
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Bot 1 Script (Martingale Bot)
+    var APP_ID = '92303';
+    let token = localStorage.getItem('authToken');
+    let CURRENCY;
+
+    let ws1; //ddd
+    if (ws1) {
+        ws1.close();
+        ws1 = undefined;
+    }
+    var isrunning = false;
+    const tbody = document.getElementById("bot-table-body");
+    const dots = document.querySelectorAll(".dot");
+
+    var total_stake = 0; 
+    var total_lost = 0;
+    var total_won = 0;
+    var total_profit = 0;
+    var stake = 1;
+    var duration = 5;
+
+    let contract_type = 'CALL';
+    let symbol = 'R_100';
+
+    try {
+      async function runWeb() {
+            token = localStorage.getItem('authToken');
+            dots.forEach((dot, index) => {
+              dot.style.backgroundColor = "#666";
+              dot.classList.remove("glow");
+            });
+        
+           //settings
+           let initial_stake = Number(document.getElementById("init-stake").value);
+           let tp = Number(document.getElementById("tp").value);
+           let sl = Number(document.getElementById("sl").value);
+           let martingale = Number(document.getElementById("plier").value);
+           let max_stake = Number(document.getElementById("maxstake").value);
+           let max_runs = Number(document.getElementById("maxruns").value);
+           //sets
+           stake = initial_stake;
+           if (!stake) {stake = 1;}
+           if (!duration) {duration = 1;}
+           if (!martingale) {martingale = 1.20}
+        
+           ws1 = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=' + APP_ID)
+            
+            ws1.addEventListener("open", () => {
+                authorize();
+            });
+        
+            ws1.addEventListener("close", (eve) => {
+                //console.dir(eve);
+            });
+        
+            ws1.addEventListener("error", (err) => {
+                //console.dir(err);
+            });
+        
+            ws1.addEventListener('message', function(data) { 
+                let ms = JSON.parse(data.data);
+        
+                let req = ms.echo_req;
+                var req_id = req.req_id;
+                const error = ms.error;
+                if (error) {
+                  console.log(ms)
+                  const mss = error.message;
+                  isrunning = false;
+                  updateRunbtn() 
+                  alert(mss);
+                }
+                else {
+                  if (req_id === 2111) {
+                      console.log('authorized');
+                      getBalance();
+                  }
+
+                  if (req_id === 2112) {
+                      CURRENCY = ms.balance.currency;
+                      if (CURRENCY) {
+                        openContract();
+                      }
+                      else {
+                        console.log('currency not found')
+                      }
+                  }
+        
+                  if (req_id === 2000) {
+                      var open = ms.proposal_open_contract;
+                      var buy = ms.buy;
+                      if (open) {
+                        var status = open.status;
+                        var longcode = open.longcode;
+                        
+                        setProgress(50);
+                        dots.forEach((dot, index) => {
+                          dot.style.backgroundColor = "#666";
+                          dot.classList.remove("glow");
+                        });
+                        document.getElementById('dot1').style.backgroundColor = "orange";
+                        document.getElementById('dot2').style.backgroundColor = "orange";
+                        document.getElementById('dot2').classList.add("glow");
+        
+                        if (status !== 'open') {
+                          total_stake += Number(open.buy_price);
+        
+                          if (status === 'won') {
+                            total_won ++;
+                            stake /= martingale;
+                            if (stake < Number(initial_stake)) {stake = initial_stake;}
+                          }
+                          else {
+                            total_lost ++;
+                            stake *= martingale;
+                          }
+                          total_profit += Number(open.profit);
+                          updateSummaries(total_stake, total_lost, total_won, total_profit);
+                          //table
+                          const date = new Date(open.date_start * 1000); // Convert seconds to milliseconds
+                          const hours = date.getHours().toString().padStart(2, '0');
+                          const minutes = date.getMinutes().toString().padStart(2, '0');
+                          const seconds = date.getSeconds().toString().padStart(2, '0');
+                          const newRow = {
+                            time: hours + ":" + minutes,
+                            asset: open.display_name,
+                            stake: open.buy_price,
+                            payout: open.profit
+                          };
+                          const tr = createRow(newRow);
+                          tbody.insertBefore(tr, tbody.firstChild);
+        
+                          document.getElementById('dot1').style.backgroundColor = "orange";
+                          document.getElementById('dot2').style.backgroundColor = "orange";
+                          document.getElementById('dot3').style.backgroundColor = "orange";
+                          document.getElementById('dot2').classList.remove("glow");
+                          setProgress(100);
+                          document.getElementById('dot3').classList.add("glow");
+                          //check stops
+                          if (total_profit >= tp) {
+                            isrunning = false;
+                            updateRunbtn() 
+                            alert('Take profit was hit');
+                          }
+                          if (total_profit <= -sl) {
+                            isrunning = false;
+                            updateRunbtn() 
+                            alert('Stoploss was hit');
+                          }
+                          if ((total_won + total_lost) >= max_runs) {
+                            isrunning = false;
+                            updateRunbtn() 
+                            alert('Maximum trades was hit');
+                          }
+                          //reenter
+                          if (isrunning) {
+                            setTimeout(() => {
+                              openContract();
+                            }, 2000);
+                          }
+                          else {
+                            updateRunbtn();
+                          }
+                        }
+                      }
+                  }
+                }
+            });
+        
+            function authorize() {
+                const msg = JSON.stringify({
+                    authorize: token,
+                    req_id: 2111
+                });
+                if (ws1.readyState !== WebSocket.CLOSED) {
+                    ws1.send(msg);
+                }
+            }
+            function getBalance() {
+                const msg = JSON.stringify({
+                    balance: 1,
+                    req_id: 2112
+                });
+                if (ws1.readyState !== WebSocket.CLOSED) {
+                    ws1.send(msg);
+                }
+            }
+        }
+        
+        function openContract() {
+            dots.forEach((dot, index) => {
+              dot.style.backgroundColor = "#666";
+              dot.classList.remove("glow");
+            });
+            document.getElementById('dot1').style.backgroundColor = "orange";
+            document.getElementById('dot1').classList.add("glow");
+            setProgress(0);
+            stake = Number(Number(stake).toFixed(2));
+            const msg = JSON.stringify({
+              "buy": 1,
+              "parameters": {
+                "amount": stake,
+                "basis": "stake",
+                "contract_type": contract_type,
+                "duration": duration,
+                "duration_unit": 't',
+                "symbol": symbol,
+                "currency": CURRENCY,
+              },
+              "price": stake,
+              "subscribe": 1,
+              "req_id": 2000
+            });
+            ws1.send(msg);
+        }
+        
+        document.getElementById('run-btn').addEventListener('click', () => {
+            if (!isrunning) {
+              isrunning = true;
+              runWeb();
+            }
+            else {
+              isrunning = false;
+            }
+            updateRunbtn();
+        });
+        
+        function updateRunbtn() {
+            var txt = 'Stop';
+            var color = 'red';
+            if (!isrunning) {
+              txt = 'Run';
+              color = 'orange';
+            }
+            document.getElementById("run-btn").style.backgroundColor = color;
+            document.getElementById("run-btn").textContent = txt;
+        }
+        
+        function updateSummaries(total_stake, total_lost, total_won, total_profit) {
+           document.getElementById("total-stake").textContent = total_stake.toFixed(2) + " " + CURRENCY;
+           document.getElementById("total-lost").textContent = total_lost;
+           document.getElementById("total-won").textContent = total_won;
+           document.getElementById("profit-loss").textContent = total_profit.toFixed(2) + " " + CURRENCY;
+        }
+        
+        function createRow(row) {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row.time}</td>
+            <td>${row.asset}</td>
+            <td>${row.stake + ' ' + CURRENCY}</td>
+            <td>${row.payout  + ' ' + CURRENCY}</td>
+          `;
+          return tr;
+        }
+        
+        function setProgress(percent) {
+          const minRight = 16.66; // 0% progress
+          const maxRight = 83.33; // 100% progress
+        
+          const totalRange = maxRight - minRight;
+          const currentRight = maxRight - (percent / 100) * totalRange;
+        
+          const container = document.querySelector('.dots-container');
+          container.style.setProperty('--progress-right', `calc(${currentRight}% + 5px)`);
+        }
+    } catch (err) {
+        isrunning = false;
+      console.error('❌ Caught error:', err);
+    }
+
+    const select = document.getElementById('market-select');
+    select.addEventListener('change', function () {
+        symbol = this.value;
+    });
+
+
+    //future errors
+    window.onerror = function(message, source, lineno, colno, error) {
+        console.error("Error caught globally:");
+        console.error(`Message: ${message}`);
+        console.error(`Source: ${source}`);
+        console.error(`Line: ${lineno}`);
+        console.error(`Column: ${colno}`);
+        console.error(`Error object:`, error);
+        
+        isrunning = false;
+        return true;
+    };
+
+    // Bot 2 Script (Digit Analysis Bot)
+    // TradePanel class for managing trade statistics
+    class TradePanel {
+        constructor() {
+            this.totalProfit = 0;
+            this.winCount = 0;
+            this.lossCount = 0;
+            this.trades = [];
+        }
+
+        updateStats(trade) {
+            this.trades.unshift(trade);
+            if (this.trades.length > 50) this.trades.pop();
+            
+            this.totalProfit += trade.profit;
+            if (trade.profit > 0) this.winCount++;
+            else this.lossCount++;
+            
+            this.updateUI();
+        }
+
+        updateUI() {
+            const statsElement = document.getElementById('trade-stats');
+            if (!statsElement) return;
+
+            const winRate = ((this.winCount / (this.winCount + this.lossCount)) * 100) || 0;
+            
+            statsElement.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-label">Total Trades</div>
+                    <div class="stat-value">${this.winCount + this.lossCount}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Win/Loss</div>
+                    <div class="stat-value">${this.winCount}/${this.lossCount}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Win Rate</div>
+                    <div class="stat-value ${winRate >= 50 ? 'positive' : 'negative'}">${winRate.toFixed(2)}%</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Total Profit</div>
+                    <div class="stat-value ${this.totalProfit >= 0 ? 'positive' : 'negative'}">${this.totalProfit.toFixed(2)} USD</div>
+                </div>
+            `;
+        }
+
+        reset() {
+            this.totalProfit = 0;
+            this.winCount = 0;
+            this.lossCount = 0;
+            this.trades = [];
+            this.updateUI();
+        }
+    }
+
+    const tradePanel = new TradePanel();
+
+    // Main arbitrage bot code
+    let derivWs;
+    let tickWs;
+    let tickHistory = [];
+    let currentSymbol = "R_100";
+    let decimalPlaces = 2;
+    let stakeAmount = 0;
+    let activeContracts = new Map();
+    let activeProposals = new Map();
+    let activeTrades = new Map();
+    let isAuthenticated = false;
+
+    let initSurvicateCalled = false;
+    let tradeResults = [];
+    let totalWins = 0;
+    let totalLosses = 0;
+
+    let pendingProposals = {
+        DIGITOVER: null,
+        DIGITUNDER: null
+    };
+
+    let subscribedContracts = new Set();
+    let activeContractPairs = new Map();
+    let totalProfit = 0;
+    let consecutiveLosses = 0;
+    const MAX_CONSECUTIVE_LOSSES = 3;
+    const PROFIT_TARGET = 50;
+
+    const storage = {
+        get(key) {
+            try {
+                return localStorage.getItem(key);
+            } catch (e) {
+                console.warn('Storage access failed:', e);
+                return null;
+            }
+        }
+    };
+
+    const tokenManager = {
+        storage: localStorage,
+        
+        getActiveToken() {
+            const active_loginid = this.getActiveLoginId();
+            const accountsList = JSON.parse(this.storage.getItem('accountsList') || '{}');
+            return accountsList[active_loginid] || null;
+        },
+
+        getActiveLoginId() {
+            const token = this.storage.getItem('authToken');
+            if (!token || token === 'null') return 'CR6360772';
+
+            const accountsList = JSON.parse(this.storage.getItem('accountsList') || '{}');
+            const activeLoginId = Object.keys(accountsList)
+                .find(key => accountsList[key] === token);
+
+            return activeLoginId || 'CR6360772';
+        },
+
+        getAccounts() {
+            try {
+                const accountsList = this.storage.getItem('accountsList');
+                if (!accountsList) {
+                    return this.getDefaultAccounts();
+                }
+
+                const parsedAccounts = JSON.parse(accountsList);
+                if (!parsedAccounts) {
+                    return this.getDefaultAccounts();
+                }
+
+                return Object.entries(parsedAccounts).reduce((acc, [loginid, token]) => {
+                    acc[loginid] = {
+                        token,
+                        currency: 'USD',
+                        loginid,
+                        accountType: loginid.startsWith('VRTC') ? 'virtual' : 'real'
+                    };
+                    return acc;
+                }, {});
+            } catch (error) {
+                console.warn('Error parsing accounts:', error);
+                return this.getDefaultAccounts();
+            }
+        },
+
+        getDefaultAccounts() {
+            return {
+                CR6360772: {
+                    token: "a1-1oLpIRm48jSZ0EGphJ27HwZwnkA9a",
+                    currency: 'USD',
+                    loginid: 'CR6360772',
+                    accountType: 'real'
+                },
+                VRTC9432913: {
+                    token: "a1-ltbv1sQMdv9O4LKESPexp7hIwrqRf",
+                    currency: 'USD',
+                    loginid: 'VRTC9432913',
+                    accountType: 'virtual'
+                }
+            };
+        },
+
+        getTokenInfo() {
+            const active_loginid = this.getActiveLoginId();
+            const client_accounts = JSON.parse(this.storage.getItem('accountsList')) || {};
+            return {
+                token: client_accounts[active_loginid] || null,
+                account_id: active_loginid
+            };
+        }
+    };
+
+    let clientStore = {
+        loginid: '',
+        is_logged_in: false,
+        accounts: {},
+        currency: 'USD',
+        balance: '0',
+        accountType: '',
+        getToken() {
+            try {
+                const { token } = tokenManager.getTokenInfo();
+                if (!token) {
+                    console.warn('No active token found');
+                    return null;
+                }
+                return token;
+            } catch (error) {
+                console.error('Error getting token:', error);
+                return null;
+            }
+        },
+        setLoginId(loginid) {
+            this.loginid = loginid;
+        },
+        setIsLoggedIn(is_logged_in) {
+            this.is_logged_in = is_logged_in;
+        },
+        setBalance(balance) {
+            this.balance = balance;
+        },
+        setCurrency(currency) {
+            this.currency = 'USD';
+        },
+        async validateToken() {
+            try {
+                const token = this.getToken();
+                
+                if (!token) {
+                    showNotification('Please log in to continue', 'error');
+                    return false;
+                }
+
+                const { authorize, error } = await auth.authorize(token);
+                if (error || !authorize) {
+                    showNotification(error?.message || 'Token validation failed', 'error');
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Token validation error:', error);
+                return false;
+            }
+        },
+        getActiveAccount() {
+            try {
+                const active_loginid = tokenManager.getActiveLoginId();
+                const accounts = tokenManager.getAccounts();
+                const account = accounts[active_loginid];
+                
+                if (!account) {
+                    console.warn('No active account found, defaulting to CR account');
+                    return accounts['CR6360772'];
+                }
+
+                this.loginid = active_loginid;
+                this.currency = 'USD';
+                this.is_logged_in = true;
+                this.balance = account.balance || '0';
+                this.accountType = account.accountType;
+                
+                return account;
+            } catch (error) {
+                console.error('Error getting active account:', error);
+                return null;
+            }
+        },
+        initialize() {
+            const account = this.getActiveAccount();
+            if (!account) {
+                console.error('No active account found during initialization');
+                return false;
+            }
+            return true;
+        }
+    };
+
+    const tradeStore = {
+        getHistory() {
+            try {
+                return JSON.parse(storage.get('tradeHistory') || '[]');
+            } catch (error) {
+                console.warn('Error getting trade history:', error);
+                return [];
+            }
+        }
+    };
+
+    function showNotification(message, type = 'info') {
+        const container = document.createElement('div');
+        container.className = `notification ${type}`;
+        container.textContent = message;
+        document.body.appendChild(container);
+
+        setTimeout(() => {
+            container.remove();
+        }, 5000);
+    }
+
+    function validateToken() {
+        return clientStore.validateToken();
+    }
+
+    const APP_CONFIG = {
+        local: '36300',
+        staging: '92303',
+        production: '92303'
+    };
+
+    function getAppId() {
+        const host = window.location.hostname;
+        if (host === 'localhost' || host === '127.0.0.1') {
+            return APP_CONFIG.local;
+        }
+        return APP_CONFIG.production;
+    }
+
+    const BOT2_APP_ID = getAppId();
+    const WS_URL = 'wss://ws.binaryws.com/websockets/v3';
+
+    const auth = {
+        ws: null,
+        connecting: false,
+        
+        async connect() {
+            if (this.connecting) return;
+            if (this.ws?.readyState === WebSocket.OPEN) return;
+            
+            this.connecting = true;
+            try {
+                this.ws = new WebSocket(`${WS_URL}?app_id=${BOT2_APP_ID}`);
+                await new Promise((resolve, reject) => {
+                    this.ws.onopen = resolve;
+                    this.ws.onerror = reject;
+                });
+            } finally {
+                this.connecting = false;
+            }
+        },
+
+        async authorize(token) {
+            if (!token) return { authorize: null, error: 'No token provided' };
+            
+            try {
+                await this.connect();
+                const response = await new Promise(resolve => {
+                    const timeoutId = setTimeout(() => {
+                        resolve({ authorize: null, error: 'Authorization timeout' });
+                    }, 10000);
+
+                    const handleMessage = (msg) => {
+                        clearTimeout(timeoutId);
+                        const data = JSON.parse(msg.data);
+                        this.ws.removeEventListener('message', handleMessage);
+                        resolve(data);
+                    };
+
+                    this.ws.addEventListener('message', handleMessage);
+                    this.ws.send(JSON.stringify({ authorize: token }));
+                });
+
+                return response;
+            } catch (error) {
+                return { authorize: null, error };
+            }
+        },
+
+        cleanup() {
+            if (this.ws) {
+                this.ws.close();
+                this.ws = null;
+            }
+        }
+    };
+
+    const wsManager = {
+        attempts: 0,
+        maxAttempts: 5,
+        baseDelay: 1000,
+        maxDelay: 16000,
+
+        resetAttempts() {
+            this.attempts = 0;
+        },
+
+        getDelay() {
+            return Math.min(this.baseDelay * Math.pow(2, this.attempts), this.maxDelay);
+        },
+
+        reconnect() {
+            if (this.attempts >= this.maxAttempts) {
+                showNotification('Max reconnection attempts reached. Please refresh.', 'error');
+                return;
+            }
+
+            const delay = this.getDelay();
+            this.attempts++;
+
+            showNotification(`Reconnecting in ${delay/1000} seconds... (Attempt ${this.attempts})`, 'warning');
+            
+            setTimeout(() => {
+                startWebSocket()
+                    .then(() => {
+                        this.resetAttempts();
+                        showNotification('Successfully reconnected!', 'success');
+                    })
+                    .catch(() => {
+                        if (this.attempts < this.maxAttempts) {
+                            this.reconnect();
+                        }
+                    });
+            }, delay);
+        }
+    };
+
+    async function startWebSocket() {
+        if (derivWs?.readyState === WebSocket.OPEN) {
+            return;
+        }
+
+        return new Promise((resolve, reject) => {
+            try {
+                derivWs = new WebSocket(`${WS_URL}?app_id=${BOT2_APP_ID}`);
+
+                const timeoutId = setTimeout(() => {
+                    reject(new Error('WebSocket connection timeout'));
+                }, 10000);
+
+                derivWs.onopen = () => {
+                    clearTimeout(timeoutId);
+                    console.log('Trading WebSocket connected');
+                    initializeWebSocket();
+                    
+                    const token = clientStore.getToken();
+                    if (token) {
+                        derivWs.send(JSON.stringify({ authorize: token }));
+                    }
+                    
+                    resolve();
+                };
+
+                derivWs.onerror = (error) => {
+                    clearTimeout(timeoutId);
+                    console.error('WebSocket connection failed:', error);
+                    reject(error);
+                };
+
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    function initializeWebSocket() {
+        if (!derivWs) return;
+
+        derivWs.onopen = () => {
+            console.log('WebSocket connected');
+            updateConnectionStatus(true);
+            wsManager.resetAttempts();
+            const token = clientStore.getToken();
+            if (token) {
+                derivWs.send(JSON.stringify({ authorize: token }));
+            }
+        };
+
+        derivWs.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            
+            if (data.error) {
+                showNotification(data.error.message, 'error');
+                return;
+            }
+
+            if (data.authorize) {
+                clientStore.setLoginId(data.authorize.loginid);
+                clientStore.setIsLoggedIn(true);
+                clientStore.setBalance(data.authorize.balance);
+                clientStore.setCurrency(data.authorize.currency);
+                requestTradeHistory();
+                subscribeToBalance();
+                return;
+            }
+
+            if (data.balance) {
+                clientStore.setBalance(data.balance.balance);
+                updateUI();
+                return;
+            }
+
+            if (data.profit_table) handleProfitTableResponse(data.profit_table);
+            if (data.buy) handleBuyResponse(data.buy);
+            if (data.proposal_open_contract) handleContractUpdate(data.proposal_open_contract);
+            if (data.proposal) handleProposalResponse(data.proposal);
+        };
+
+        derivWs.onclose = (event) => {
+            console.log('WebSocket disconnected', event.code);
+            updateConnectionStatus(false);
+            if (!event.wasClean) {
+                wsManager.reconnect();
+            }
+        };
+
+        derivWs.onerror = (error) => {
+            console.error('WebSocket error:', error);
+            updateConnectionStatus(false);
+        };
+    }
+
+    function updateConnectionStatus(connected) {
+        const statusElement = document.getElementById('ws-status');
+        if (statusElement) {
+            statusElement.classList.toggle('connected', connected);
+            statusElement.style.backgroundColor = connected ? '#4CAF50' : '#f44336';
+            statusElement.title = connected ? 'Connected' : 'Disconnected';
+        }
+    }
+
+    function startTickAnalysis(symbol = 'R_100') {
+        return new Promise((resolve, reject) => {
+            if (tickWs?.readyState === WebSocket.OPEN) {
+                tickWs.close();
+            }
+
+            try {
+                tickWs = new WebSocket(`${WS_URL}?app_id=${BOT2_APP_ID}`);
+                
+                const timeoutId = setTimeout(() => {
+                    reject(new Error('Tick WebSocket connection timeout'));
+                }, 10000);
+
+                tickWs.onopen = () => {
+                    clearTimeout(timeoutId);
+                    console.log('Tick WebSocket connected');
+                    subscribeTicks(symbol);
+                    resolve();
+                };
+
+                tickWs.onclose = (event) => {
+                    console.log('Tick WebSocket closed:', event.code);
+                    if (!event.wasClean) {
+                        reject(new Error('Tick WebSocket closed unexpectedly'));
+                    }
+                };
+
+                tickWs.onerror = (error) => {
+                    console.error('Tick WebSocket error:', error);
+                    reject(error);
+                };
+
+                tickWs.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        processTickData(data);
+                    } catch (error) {
+                        console.error('Error processing tick data:', error);
+                    }
+                };
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    function subscribeTicks(symbol) {
+        if (!tickWs || tickWs.readyState !== WebSocket.OPEN) return;
+
+        const historyRequest = {
+            ticks_history: symbol,
+            adjust_start_time: 1,
+            count: 100,
+            end: "latest",
+            start: Math.floor(Date.now() / 1000) - 3600,
+            style: "ticks"
+        };
+        
+        const tickRequest = {
+            ticks: symbol,
+            subscribe: 1
+        };
+
+        tickWs.send(JSON.stringify(historyRequest));
+        setTimeout(() => {
+            tickWs.send(JSON.stringify(tickRequest));
+        }, 500);
+    }
+
+    function processTickData(data) {
+        if (data.error) {
+            console.error('Tick data error:', data.error);
+            return;
+        }
+
+        if (data.history) {
+            tickHistory = data.history.prices.map((price, index) => ({
+                time: data.history.times[index] * 1000,
+                quote: parseFloat(price),
+                digit: getLastDigit(price)
+            }));
+            detectDecimalPlaces();
+            updateDigitAnalysis();
+        }
+        
+        if (data.tick) {
+            const quote = parseFloat(data.tick.quote);
+            const tick = {
+                time: data.tick.epoch * 1000,
+                quote: quote,
+                digit: getLastDigit(quote)
+            };
+            
+            tickHistory.push(tick);
+            if (tickHistory.length > 100) tickHistory.shift();
+            updateDigitAnalysis();
+        }
+    }
+
+    function updateDigitAnalysis() {
+        if (!tickHistory.length) return;
+
+        const lastTick = tickHistory[tickHistory.length - 1];
+        
+        const priceElement = document.getElementById("current-price");
+        if (priceElement) {
+            priceElement.textContent = lastTick.quote.toFixed(decimalPlaces);
+        }
+
+        const digitStats = calculateDigitStats();
+        updateDigitDisplay(digitStats, lastTick.digit);
+    }
+
+    function calculateDigitStats() {
+        const stats = new Array(10).fill(0);
+        const recentTicks = tickHistory.slice(-30);
+
+        recentTicks.forEach(tick => {
+            if (tick && typeof tick.quote === 'number') {
+                const digit = getLastDigit(tick.quote);
+                if (digit >= 0 && digit <= 9) {
+                    stats[digit]++;
+                }
+            }
+        });
+
+        return stats.map(count => ({
+            count,
+            percentage: (count / recentTicks.length) * 100
+        }));
+    }
+
+    function updateDigitDisplay(digitStats, currentDigit) {
+        const container = document.getElementById("digit-display-container");
+        if (!container) return;
+
+        const maxCount = Math.max(...digitStats.map(s => s.count));
+        const minCount = Math.min(...digitStats.map(s => s.count));
+
+        container.innerHTML = digitStats.map((stat, digit) => `
+            <div class="digit-container ${digit === currentDigit ? 'current' : ''}">
+                <div class="digit-box ${stat.count === maxCount ? 'highest' : ''} 
+                                   ${stat.count === minCount ? 'lowest' : ''}">
+                    ${digit}
+                </div>
+                <div class="digit-percentage">
+                    ${stat.percentage.toFixed(1)}%
+                </div>
+                ${digit === currentDigit ? '<div class="arrow"></div>' : ''}
+            </div>
+        `).join('');
+    }
+
+    function requestTradeHistory() {
+        if (!derivWs || derivWs.readyState !== WebSocket.OPEN) {
+            return;
+        }
+
+        const request = {
+            "profit_table": 1,
+            "description": 1,
+            "sort": "DESC",
+            "limit": 10
+        };
+
+        derivWs.send(JSON.stringify(request));
+    }
+
+    // FIXED: Optimized placeTrades function for faster execution
+    function placeTrades(stake, symbol, underBarrier, overBarrier) {
+        if (!derivWs || derivWs.readyState !== WebSocket.OPEN) {
+            showNotification('Reconnecting before placing trades...', 'warning');
+            wsManager.reconnect();
+            return;
+        }
+
+        const halfStake = stake / 2;
+
+        // Place DIGITOVER trade with overBarrier
+        const overRequest = {
+            buy: 1,
+            subscribe: 1,
+            price: halfStake,
+            parameters: {
+                amount: halfStake,
+                basis: "stake",
+                contract_type: "DIGITOVER",
+                currency: "USD",
+                duration: 1,
+                duration_unit: "t",
+                symbol: symbol,
+                barrier: overBarrier.toString()
+            }
+        };
+
+        // Place DIGITUNDER trade with underBarrier
+        const underRequest = {
+            buy: 1,
+            subscribe: 1,
+            price: halfStake,
+            parameters: {
+                amount: halfStake,
+                basis: "stake",
+                contract_type: "DIGITUNDER",
+                currency: "USD",
+                duration: 1,
+                duration_unit: "t",
+                symbol: symbol,
+                barrier: underBarrier.toString()
+            }
+        };
+
+        // Send both requests immediately without delay for faster execution
+        derivWs.send(JSON.stringify(overRequest));
+        derivWs.send(JSON.stringify(underRequest));
+        
+        showNotification(`Placing trades with $${halfStake.toFixed(2)} each (Under ${underBarrier}, Over ${overBarrier})...`, 'info');
+    }
+
+    function handleProposalResponse(proposal) {
+        if (!proposal?.id || !proposal?.ask_price) return;
+
+        pendingProposals[proposal.contract_type] = {
+            id: proposal.id,
+            price: proposal.ask_price,
+            type: proposal.contract_type,
+            barrier: proposal.barrier,
+            timestamp: Date.now()
+        };
+
+        const buyRequest = {
+            buy: proposal.id,
+            price: proposal.ask_price
+        };
+
+        if (proposal.contract_type === "DIGITOVER" || proposal.contract_type === "DIGITUNDER") {
+            derivWs.send(JSON.stringify(buyRequest));
+            showNotification(`Placing ${proposal.contract_type} trade at barrier ${proposal.barrier}`, 'info');
+        }
+    }
+
+    function handleContractUpdate(contract) {
+        if (!contract?.contract_id) return;
+
+        if (contract.status === "open") {
+            activeContracts.set(contract.contract_id, {
+                type: contract.contract_type,
+                entrySpot: contract.entry_spot,
+                barrier: contract.barrier,
+                buyPrice: contract.buy_price,
+                timestamp: Date.now()
+            });
+        }
+
+        if (contract.status === "won" || contract.status === "lost") {
+            const tradeData = activeContracts.get(contract.contract_id);
+            if (tradeData) {
+                const result = {
+                    time: new Date().toLocaleTimeString(),
+                    type: contract.contract_type,
+                    digit: contract.exit_tick_display_value?.slice(-1) || 'N/A',
+                    entrySpot: contract.entry_tick_display_value,
+                    exitSpot: contract.exit_tick_display_value,
+                    barrier: contract.barrier,
+                    buyPrice: contract.buy_price,
+                    payout: contract.payout,
+                    profit: contract.profit,
+                    isWin: contract.status === "won",
+                    duration: ((contract.sell_time - contract.purchase_time) / 1000).toFixed(1),
+                    contractId: contract.contract_id
+                };
+
+                tradeResults.unshift(result);
+                if (tradeResults.length > 50) tradeResults.pop();
+
+                if (result.isWin) {
+                    totalWins++;
+                    consecutiveLosses = 0;
+                } else {
+                    totalLosses++;
+                    consecutiveLosses++;
+                }
+
+                totalProfit += parseFloat(result.profit);
+                updateResultsDisplay();
+
+                tradePanel.updateStats({
+                    symbol: currentSymbol,
+                    type: result.type,
+                    profit: result.profit
+                });
+
+                if (consecutiveLosses >= MAX_CONSECUTIVE_LOSSES) {
+                    showNotification(`Max consecutive losses (${MAX_CONSECUTIVE_LOSSES}) reached`, 'error');
+                } else if (totalProfit >= PROFIT_TARGET) {
+                    showNotification(`Target profit of $${PROFIT_TARGET} reached!`, 'success');
+                }
+
+                activeContracts.delete(contract.contract_id);
+            }
+        }
+    }
+
+    function cleanupTrades() {
+        tradeResults = [];
+        totalWins = 0;
+        totalLosses = 0;
+
+        pendingProposals = {
+            DIGITOVER: null,
+            DIGITUNDER: null
+        };
+
+        activeProposals.forEach((proposal, id) => {
+            const request = {
+                forget: id
+            };
+            derivWs.send(JSON.stringify(request));
+        });
+        activeProposals.clear();
+
+        activeContracts.forEach((_, contractId) => {
+            const request = {
+                forget_all: ["proposal_open_contract"],
+                contract_id: contractId
+            };
+            derivWs.send(JSON.stringify(request));
+        });
+        activeContracts.clear();
+
+        subscribedContracts.clear();
+        activeContractPairs.clear();
+        totalProfit = 0;
+        consecutiveLosses = 0;
+    }
+
+    window.addEventListener('beforeunload', cleanupTrades);
+
+    function subscribeToContract(contractId) {
+        if (subscribedContracts.has(contractId)) {
+            return;
+        }
+
+        const request = {
+            proposal_open_contract: 1,
+            subscribe: 1,
+            contract_id: contractId
+        };
+
+        derivWs.send(JSON.stringify(request));
+        subscribedContracts.add(contractId);
+    }
+
+    function subscribeToBalance() {
+        if (derivWs && derivWs.readyState === WebSocket.OPEN) {
+            const request = {
+                balance: 1,
+                subscribe: 1
+            };
+            derivWs.send(JSON.stringify(request));
+        }
+    }
+
+    function detectDecimalPlaces() {
+        if (tickHistory.length === 0) return;
+        let decimalCounts = tickHistory.map(tick => {
+            let decimalPart = tick.quote.toString().split(".")[1] || "";
+            return decimalPart.length;
+        });
+        decimalPlaces = Math.max(...decimalCounts, 2);
+    }
+
+    function getLastDigit(price) {
+        if (price === undefined || price === null) return 0;
+
+        try {
+            let priceStr = price.toString();
+            let priceParts = priceStr.split(".");
+            let decimals = priceParts[1] || "";
+            while (decimals.length < decimalPlaces) decimals += "0";
+            return Number(decimals.slice(-1));
+        } catch (error) {
+            console.error('Error getting last digit:', error);
+            return 0;
+        }
+    }
+
+    function updateUI() {
+        try {
+            const balanceElement = document.getElementById("account-balance");
+            if (balanceElement) {
+                balanceElement.textContent = `Balance: ${clientStore.currency} ${Number(clientStore.balance).toFixed(2)}`;
+            }
+        } catch (error) {
+            console.error('Error updating UI:', error);
+        }
+    }
+
+    function updateResultsDisplay() {
+        const container = document.querySelector('.bot2-results-card');
+        if (!container) return;
+
+        const totalTrades = totalWins + totalLosses;
+        const winRate = totalTrades > 0 ? ((totalWins / totalTrades) * 100).toFixed(1) : '0.0';
+
+        const statsHtml = `
+            <div class="trade-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Total Trades</div>
+                    <div class="stat-value">${totalTrades}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Win/Loss</div>
+                    <div class="stat-value">${totalWins}/${totalLosses}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Win Rate</div>
+                    <div class="stat-value ${parseFloat(winRate) >= 50 ? 'positive' : 'negative'}">${winRate}%</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Total Profit</div>
+                    <div class="stat-value ${totalProfit >= 0 ? 'positive' : 'negative'}">$${totalProfit.toFixed(2)}</div>
+                </div>
+            </div>
+            <div class="trade-results">
+                ${tradeResults.map(result => `
+                    <div class="trade-result ${result.isWin ? 'win' : 'loss'}">
+                        <div class="trade-details">
+                            <span>${result.time}</span>
+                            <span>${result.type} ${result.barrier}</span>
+                            <span>Digit: ${result.digit}</span>
+                        </div>
+                        <span class="trade-profit">
+                            ${result.profit >= 0 ? '+' : ''}$${parseFloat(result.profit).toFixed(2)}
+                        </span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        container.innerHTML = `<h2>Trading Results</h2>${statsHtml}`;
+    }
+
+    function syncSymbol(newSymbol) {
+        if (!newSymbol) return;
+        
+        currentSymbol = newSymbol;
+        
+        const symbolDropdown = document.getElementById('symbol');
+        if (symbolDropdown && symbolDropdown.value !== newSymbol) {
+            symbolDropdown.value = newSymbol;
+        }
+        
+        tickHistory = [];
+        startTickAnalysis(newSymbol);
+
+        if (clientStore.getToken()) {
+            startWebSocket();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            syncSymbol(currentSymbol);
+            
+            let connectionAttempts = 0;
+            const maxAttempts = 3;
+            
+            while (connectionAttempts < maxAttempts) {
+                try {
+                    await Promise.all([
+                        startWebSocket().catch(e => {
+                            console.warn('WebSocket connection failed, retrying...', e);
+                            throw e;
+                        }),
+                        startTickAnalysis(currentSymbol).catch(e => {
+                            console.warn('Tick analysis connection failed, retrying...', e);
+                            throw e;
+                        })
+                    ]);
+                    break;
+                } catch (error) {
+                    connectionAttempts++;
+                    if (connectionAttempts === maxAttempts) {
+                        throw new Error('Failed to establish WebSocket connections after multiple attempts');
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            }
+
+            const token = clientStore.getToken();
+            if (token) {
+                const isValid = await clientStore.validateToken();
+                if (isValid) {
+                    isAuthenticated = true;
+                    showNotification('Successfully connected to trading server', 'success');
+                }
+            }
+
+            document.getElementById('fullscreen-btn')?.addEventListener('click', toggleFullscreen);
+
+            updateUI();
+            
+        } catch (error) {
+            console.error('Failed to initialize:', error);
+            showNotification('Failed to connect to trading server. Please refresh.', 'error');
+        }
+    });
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement &&
+            !document.mozFullScreenElement &&
+            !document.webkitFullscreenElement &&
+            !document.msFullscreenElement) {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                document.documentElement.msRequestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        }
+    }
+
+    // Add event listener for the new Place Bulk Trade button
+    document.getElementById('placeBulkTradeBtn').addEventListener('click', function() {
+        const activeAccount = clientStore.getActiveAccount();
+        if (!activeAccount) {
+            showNotification('Please log in to continue', 'error');
+            return;
+        }
+
+        if (!validateToken()) return;
+
+        const stake = parseFloat(document.getElementById('stake').value);
+        const underBarrier = parseInt(document.getElementById('underBarrier').value);
+        const overBarrier = parseInt(document.getElementById('overBarrier').value);
+        const symbol = document.getElementById('symbol').value;
+
+        if (stake && symbol) {
+            if (underBarrier >= overBarrier) {
+                showNotification('Under barrier must be less than over barrier', 'error');
+                return;
+            }
+
+            cleanupTrades();
+            stakeAmount = stake;
+            currentSymbol = symbol;
+
+            // Execute trade with the specified barriers
+            placeTrades(stake, symbol, underBarrier, overBarrier);
+        }
+    });
+
+    // Update the symbol change handler
+    document.getElementById('symbol').addEventListener('change', function(e) {
+        syncSymbol(e.target.value);
+    });
+  </script>
+</body>
+</html>

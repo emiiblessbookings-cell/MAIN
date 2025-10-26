@@ -1,9 +1,10 @@
-@import '../../styles/mixins.scss';
+@use 'components/shared/styles/mixins' as *;
 
 .bot {
     &__chart-container {
         position: relative;
         top: 0;
+
         &-wrapper {
             position: absolute;
             top: 0;
@@ -23,12 +24,14 @@
                 &.ciq-disabled {
                     display: none;
                 }
+
                 @include mobile-screen {
                     width: auto;
 
                     .cq-menu-btn {
                         padding: 0.2rem;
                     }
+
                     .cq-symbol-select-btn {
                         margin: 0.2rem;
 
@@ -36,6 +39,7 @@
                             transform: scale(1);
                             margin-left: auto;
                         }
+
                         .cq-symbol {
                             font-size: 1.4rem;
                         }
@@ -70,6 +74,7 @@
                     border-radius: 50%;
                     margin: 0.8rem;
                     opacity: 0.75;
+
                     @include flex-center;
 
                     &__menu {
@@ -77,12 +82,14 @@
                             top: 0.8rem;
                             left: 0.8rem;
                         }
+
                         & > .ic-icon {
                             top: 0.6rem;
                         }
                     }
                 }
             }
+
             .app-contents .ciq-menu {
                 margin: 0;
             }
@@ -92,6 +99,7 @@
     .smartcharts-mobile {
         .cq-context {
             z-index: 99;
+
             .sc-mcd__category:last-child {
                 margin-bottom: 3rem !important;
             }
@@ -100,16 +108,27 @@
         & .cq-chart-title .cq-menu-dropdown {
             position: fixed;
             height: 100% !important;
+
             .sc-dialog {
                 height: 100% !important;
+
                 &__body {
                     height: inherit !important;
+
                     .sc-mcd {
                         height: inherit !important;
                         min-width: auto !important;
                     }
                 }
             }
+        }
+
+        .sc-mcd__item {
+            padding-left: 10px !important;
+        }
+
+        .sc-mcd__category__content .subcategory {
+            padding-left: 10px !important;
         }
     }
 }

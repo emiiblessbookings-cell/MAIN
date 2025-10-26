@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Field, FieldProps, useFormikContext } from 'formik';
-import { ApiHelpers } from '@deriv/bot-skeleton';
-import { Autocomplete, Icon, Text } from '@deriv/components';
-import { TItem } from '@deriv/components/src/components/dropdown-list';
-import { useStore } from '@deriv/stores';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { MarketIcon } from '@/components/market/market-icon';
+import Autocomplete from '@/components/shared_ui/autocomplete';
+import { TItem } from '@/components/shared_ui/dropdown-list';
+import Text from '@/components/shared_ui/text';
+import { ApiHelpers } from '@/external/bot-skeleton';
+import { useStore } from '@/hooks/useStore';
+import { useDevice } from '@deriv-com/ui';
 import { TFormData } from '../types';
 import { V2_QS_STRATEGIES } from '../utils';
 
@@ -21,7 +23,7 @@ type TMarketOption = {
 
 const MarketOption: React.FC<TMarketOption> = ({ symbol }) => (
     <div key={symbol.value} className='qs__select__option'>
-        <Icon data_testid='dt_symbol_icon' icon={`IcUnderlying${symbol.value}`} size={32} />
+        <MarketIcon type={symbol.value} size='sm' />
         <Text className='qs__select__option__text' size='xs' color='prominent'>
             {symbol.text}
         </Text>
@@ -29,40 +31,35 @@ const MarketOption: React.FC<TMarketOption> = ({ symbol }) => (
 );
 
 const SymbolSelect: React.FC = () => {
-    const { quick_strategy } = useDBotStore();
-    const {
-        ui: { is_desktop },
-    } = useStore();
+    const { quick_strategy } = useStore();
+    const { isDesktop } = useDevice();
     const { setValue, selected_strategy } = quick_strategy;
     const [active_symbols, setActiveSymbols] = React.useState<TSymbol[]>([]);
     const [is_input_started, setIsInputStarted] = useState(false);
     const [input_value, setInputValue] = useState({ text: '', value: '' });
     const [last_selected_symbol, setLastSelectedSymbol] = useState({ text: '', value: '' });
     const { setFieldValue, values } = useFormikContext<TFormData>();
-
     const is_strategy_accumulator = V2_QS_STRATEGIES.includes(selected_strategy);
 
     const symbols = useMemo(
         () =>
-            active_symbols.map((symbol: TSymbol) => ({
-                component: <MarketOption key={symbol.text} symbol={symbol} />,
-                ...symbol,
-            })),
-        [active_symbols]
+            active_symbols
+                .map((symbol: TSymbol) => ({
+                    component: <MarketOption key={symbol.text} symbol={symbol} />,
+                    ...symbol,
+                }))
+                .filter(symbol => !is_strategy_accumulator || symbol?.group?.startsWith('Continuous Indices')),
+        [active_symbols, is_strategy_accumulator]
     );
 
     useEffect(() => {
-        const { active_symbols } = ApiHelpers.instance as unknown as {
-            active_symbols: {
-                getSymbolsForBot: () => TSymbol[];
-            };
-        };
-        let symbols = active_symbols.getSymbolsForBot();
-
-        if (is_strategy_accumulator) {
-            symbols = symbols.filter(symbol => symbol?.group?.startsWith('Continuous Indices'));
-        }
-
+        const { active_symbols } =
+            (ApiHelpers?.instance as unknown as {
+                active_symbols: {
+                    getSymbolsForBot: () => TSymbol[];
+                };
+            }) ?? {};
+        const symbols = active_symbols?.getSymbolsForBot?.();
         setActiveSymbols(symbols);
 
         const has_symbol = !!symbols?.find(symbol => symbol?.value === values?.symbol);
@@ -81,9 +78,8 @@ const SymbolSelect: React.FC = () => {
     }, [symbols, values.symbol, setInputValue]);
 
     const handleFocus = () => {
-        if (is_desktop && !is_input_started) {
+        if (isDesktop && !is_input_started) {
             setIsInputStarted(true);
-            setInputValue({ text: '', value: '' });
         }
     };
 
@@ -101,7 +97,7 @@ const SymbolSelect: React.FC = () => {
     };
 
     const handleHideDropdownList = () => {
-        if (is_desktop) {
+        if (isDesktop) {
             const selectedSymbol = symbols.find(symbol => symbol.value === values.symbol);
             if (selectedSymbol && selectedSymbol.text !== input_value.text) {
                 setInputValue({ text: selectedSymbol.text, value: selectedSymbol.value });
@@ -118,11 +114,11 @@ const SymbolSelect: React.FC = () => {
     return (
         <div className='qs__form__field qs__form__field__input'>
             <Field name='symbol' key='asset' id='asset'>
-                {({ field: { value, ...rest_field } }: FieldProps) => (
+                {({ field: { ...rest_field } }: FieldProps) => (
                     <>
                         <Autocomplete
                             {...rest_field}
-                            readOnly={!is_desktop}
+                            readOnly={!isDesktop}
                             inputMode='none'
                             data-testid='dt_qs_symbol'
                             autoComplete='off'
@@ -133,7 +129,7 @@ const SymbolSelect: React.FC = () => {
                             onChange={handleInputChange}
                             onFocus={handleFocus}
                             onHideDropdownList={handleHideDropdownList}
-                            leading_icon={<Icon icon={`IcUnderlying${input_value.value}`} size={24} />}
+                            leading_icon={<MarketIcon type={input_value.value} size='sm' />}
                         />
                     </>
                 )}

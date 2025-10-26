@@ -1,4 +1,4 @@
-import { localize } from '@deriv/translations';
+import { localize } from '@deriv-com/translations';
 
 export type TSidebarItem = {
     label: string;
@@ -6,40 +6,20 @@ export type TSidebarItem = {
     link: boolean;
 };
 
-export const SIDEBAR_INTRO: TSidebarItem[] = [
+export const SIDEBAR_INTRO = (): TSidebarItem[] => [
     {
-        label: localize('Welcome to RUGARA HUB'),
+        label: localize('Welcome to Emiisdtrader! '),
         content: [
             {
-                data: localize(
-                    'Ready to automate your trading strategy without writing any code? You’ve come to the right place.'
-                ),
+                data: localize('Your Gateway to Smarter, Automated Profits! I want us to be rich!'),
             },
-            { data: localize('Check out these guides and FAQs to learn more about building your bot:') },
         ],
         link: false,
     },
     {
         label: localize('Guide'),
-        content: [{ data: localize('Deriv Bot - your automated trading partner') }],
-        link: true,
-    },
-    {
-        label: localize('FAQs'),
-        content: [
-            {
-                data: localize('What is Deriv Bot?'),
-                faq_id: 'faq-0',
-            },
-            {
-                data: localize('Where do I find the blocks I need?'),
-                faq_id: 'faq-1',
-            },
-            {
-                data: localize('How do I remove blocks from the workspace?'),
-                faq_id: 'faq-2',
-            },
-        ],
+        content: [{ data: localize('Emiisdtrader - your Expert Deriv partner') }],
         link: true,
     },
 ];
+

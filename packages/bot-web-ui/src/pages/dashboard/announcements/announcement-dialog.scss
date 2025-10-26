@@ -1,9 +1,15 @@
+@use 'components/shared/styles/mixins' as *;
+
 .announcement-dialog {
     .dc-dialog {
         &__dialog {
             max-width: calc(440px - 4.8rem);
             max-height: none;
             padding: 0;
+
+            @include mobile-or-tablet-screen {
+                max-width: unset;
+            }
 
             @include mobile-or-tablet-screen {
                 margin-top: 0;
@@ -65,6 +71,10 @@
                     margin-bottom: 0;
                 }
             }
+        }
+
+        &__button:last-child {
+            margin-left: 0.8rem;
         }
     }
 
@@ -129,6 +139,7 @@
     &__image {
         min-height: 16rem;
         padding-top: 1.6rem;
+        width: 100%;
     }
 
     &__unordered_list {
@@ -139,6 +150,7 @@
 
     &__title {
         margin-bottom: 1rem;
+
         &--accumulator_announce {
             text-align: center;
         }

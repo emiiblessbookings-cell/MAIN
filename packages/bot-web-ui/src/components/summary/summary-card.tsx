@@ -1,24 +1,25 @@
 import React from 'react';
 import classNames from 'classnames';
-import { ContractCard, Text } from '@deriv/components';
-import { getCardLabels } from '@deriv/shared';
-import { observer, useStore } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import ContractCardLoader from 'Components/contract-card-loading';
-import { getContractTypeDisplay } from 'Constants/contract';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import Text from '@/components/shared_ui/text';
+import { getContractTypeDisplay } from '@/constants/contract';
+import { useStore } from '@/hooks/useStore';
+import { localize } from '@deriv-com/translations';
+import { useDevice } from '@deriv-com/ui';
+import ContractCardLoader from '../contract-card-loading';
+import { getCardLabels } from '../shared';
+import ContractCard from '../shared_ui/contract-card';
 import { TSummaryCardProps } from './summary-card.types';
 
 const SummaryCard = observer(({ contract_info, is_contract_loading, is_bot_running }: TSummaryCardProps) => {
-    const { summary_card, run_panel } = useDBotStore();
-    const { ui, common } = useStore();
+    const { summary_card, run_panel, ui, common } = useStore();
     const { is_contract_completed, is_contract_inactive, is_multiplier, is_accumulator, setIsBotRunning } =
         summary_card;
     const { onClickSell, is_sell_requested, contract_stage } = run_panel;
     const { addToast, current_focus, removeToast, setCurrentFocus } = ui;
     const { server_time } = common;
 
-    const { is_desktop } = ui;
+    const { isDesktop } = useDevice();
 
     React.useEffect(() => {
         const cleanup = setIsBotRunning();
@@ -45,7 +46,7 @@ const SummaryCard = observer(({ contract_info, is_contract_loading, is_bot_runni
             error_message_alignment='left'
             getCardLabels={getCardLabels}
             getContractById={() => summary_card}
-            is_mobile={!is_desktop}
+            is_mobile={!isDesktop}
             is_multiplier={is_multiplier}
             is_accumulator={is_accumulator}
             is_sold={is_contract_completed}
@@ -76,10 +77,10 @@ const SummaryCard = observer(({ contract_info, is_contract_loading, is_bot_runni
     return (
         <div
             className={classNames('db-summary-card', {
-                'db-summary-card--mobile': !is_desktop,
+                'db-summary-card--mobile': !isDesktop,
                 'db-summary-card--inactive': is_contract_inactive && !is_contract_loading && !contract_info,
                 'db-summary-card--completed': is_contract_completed,
-                'db-summary-card--completed-mobile': is_contract_completed && !is_desktop,
+                'db-summary-card--completed-mobile': is_contract_completed && !isDesktop,
                 'db-summary-card--delayed-loading': is_bot_running,
             })}
             data-testid='dt_mock_summary_card'
@@ -105,9 +106,9 @@ const SummaryCard = observer(({ contract_info, is_contract_loading, is_bot_runni
                 </ContractCard>
             )}
             {!is_contract_loading && !contract_info && !is_bot_running && (
-                <Text as='p' line_height='s' size='xs'>
+                <Text as='p' align='center' lineHeight='s' size='xs'>
                     {localize('When you’re ready to trade, hit ')}
-                    <strong>{localize('Run')}</strong>
+                    <strong className='summary-panel-inactive__strong'>{localize('Run')}</strong>
                     {localize('. You’ll be able to track your bot’s performance here.')}
                 </Text>
             )}

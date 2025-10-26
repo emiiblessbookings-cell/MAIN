@@ -1,9 +1,11 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Field, FieldProps, useFormikContext } from 'formik';
-import { Popover, Text, ToggleSwitch } from '@deriv/components';
+import { Field, useFormikContext } from 'formik';
+import Popover from '@/components/shared_ui/popover';
+import Text from '@/components/shared_ui/text';
+import ToggleSwitch from '@/components/shared_ui/toggle-switch';
+import { localize } from '@deriv-com/translations';
 import { TFormData } from '../types';
-import { localize } from '@deriv/translations';
 
 type TQSToggleSwitch = {
     name: string;
@@ -32,7 +34,7 @@ const QSToggleSwitch: React.FC<TQSToggleSwitch> = ({
 
     return (
         <Field name={name}>
-            {({ field }: FieldProps) => {
+            {() => {
                 return (
                     <div
                         className={classNames('qs__form__field qs__form__field__input', {
@@ -45,7 +47,7 @@ const QSToggleSwitch: React.FC<TQSToggleSwitch> = ({
                                     <Text size='xs' className='dc-checkbox__label'>
                                         {label}
                                     </Text>
-                                    <Text size='xxs'>{localize('(optional)')}</Text>
+                                    <Text size='xs'>{localize('(optional)')}</Text>
                                 </label>
                                 <span>
                                     <Popover

@@ -1,12 +1,13 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Button, Icon } from '@deriv/components';
-import { observer, useStore } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import ContractResultOverlay from 'Components/contract-result-overlay';
-import { contract_stages } from 'Constants/contract-stage';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import ContractResultOverlay from '@/components/contract-result-overlay';
+import { contract_stages } from '@/constants/contract-stage';
+import { useStore } from '@/hooks/useStore';
+import { LabelPairedPlayLgFillIcon, LabelPairedSquareLgFillIcon } from '@deriv/quill-icons/LabelPaired';
+import { Localize } from '@deriv-com/translations';
 import { rudderStackSendRunBotEvent } from '../../analytics/rudderstack-common-events';
+import Button from '../shared_ui/button';
 import CircularWrapper from './circular-wrapper';
 import ContractStageText from './contract-stage-text';
 
@@ -16,7 +17,7 @@ type TTradeAnimation = {
 };
 
 const TradeAnimation = observer(({ className, should_show_overlay }: TTradeAnimation) => {
-    const { dashboard, run_panel, summary_card } = useDBotStore();
+    const { dashboard, run_panel, summary_card } = useStore();
     const { client } = useStore();
     const { active_tab } = dashboard;
     const { is_contract_completed, profit } = summary_card;
@@ -74,20 +75,20 @@ const TradeAnimation = observer(({ className, should_show_overlay }: TTradeAnima
             return {
                 id: 'db-animation__stop-button',
                 class: 'animation__stop-button',
-                text: localize('Stop'),
-                icon: 'IcBotStop',
+                text: <Localize i18n_default_text='Stop' />,
+                icon: <LabelPairedSquareLgFillIcon fill='#fff' />,
             };
         }
         return {
             id: 'db-animation__run-button',
             class: 'animation__run-button',
-            text: localize('Run'),
-            icon: 'IcPlay',
+            text: <Localize i18n_default_text='Run' />,
+            icon: <LabelPairedPlayLgFillIcon fill='#fff' />,
         };
     }, [is_stop_button_visible]);
     const show_overlay = should_show_overlay && is_contract_completed;
 
-    const TAB_NAMES = ['dashboard', 'bot_builder', 'charts', 'tutorials'] as const;
+    const TAB_NAMES = ['dashboard', 'bot_builder', 'charts', 'auto'] as const;
     const getTabName = (index: number) => TAB_NAMES[index];
 
     return (
@@ -96,8 +97,7 @@ const TradeAnimation = observer(({ className, should_show_overlay }: TTradeAnima
                 is_disabled={is_disabled && !is_unavailable_for_payment_agent}
                 className={button_props.class}
                 id={button_props.id}
-                text={button_props.text}
-                icon={<Icon icon={button_props.icon} color='active' />}
+                icon={button_props.icon}
                 onClick={() => {
                     setShouldDisable(true);
                     if (is_stop_button_visible) {
@@ -109,14 +109,16 @@ const TradeAnimation = observer(({ className, should_show_overlay }: TTradeAnima
                 }}
                 has_effect
                 {...(is_stop_button_visible || !is_unavailable_for_payment_agent ? { primary: true } : { green: true })}
-            />
+            >
+                {button_props.text}
+            </Button>
             <div
                 className={classNames('animation__container', className, {
                     'animation--running': contract_stage > 0,
                     'animation--completed': show_overlay,
                 })}
             >
-                {show_overlay && <ContractResultOverlay profit={profit ?? 0} />}
+                {show_overlay && <ContractResultOverlay profit={profit} />}
                 <span className='animation__text'>
                     <ContractStageText contract_stage={contract_stage} />
                 </span>

@@ -1,20 +1,24 @@
 import React, { useRef, useState } from 'react';
 import { Form as FormikForm, Formik } from 'formik';
+import { observer } from 'mobx-react-lite';
 import * as Yup from 'yup';
-import { config as qs_config } from '@deriv/bot-skeleton';
-import { MobileFullPageModal, Modal, Text } from '@deriv/components';
-import { observer, useStore } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import { useDBotStore } from 'Stores/useDBotStore';
+import MobileFullPageModal from '@/components/shared_ui/mobile-full-page-modal';
+import Modal from '@/components/shared_ui/modal';
+import Text from '@/components/shared_ui/text';
+import { config as qs_config } from '@/external/bot-skeleton';
+import { useStore } from '@/hooks/useStore';
+import { localize } from '@deriv-com/translations';
+import { useDevice } from '@deriv-com/ui';
 import { rudderStackSendCloseEvent } from '../../../analytics/rudderstack-common-events';
 import DesktopFormWrapper from './form-wrappers/desktop-form-wrapper';
 import MobileFormWrapper from './form-wrappers/mobile-form-wrapper';
+import MobileQSFooter from './form-wrappers/mobile-qs-footer';
+import { QsSteps } from './form-wrappers/trade-constants';
 import LossThresholdWarningDialog from './parts/loss-threshold-warning-dialog';
 import { STRATEGIES } from './config';
 import Form from './form';
 import { TConfigItem, TFormData, TFormValues } from './types';
 import './quick-strategy.scss';
-import { QsSteps } from './form-wrappers/trade-constants';
 
 type TFormikWrapper = {
     children: React.ReactNode;
@@ -39,10 +43,9 @@ const getErrorMessage = (dir: 'MIN' | 'MAX', value: number, type = 'DEFAULT') =>
 };
 
 const FormikWrapper: React.FC<TFormikWrapper> = observer(({ children }) => {
-    const { quick_strategy } = useDBotStore();
-    const { selected_strategy, form_data, current_duration_min_max, initializeLossThresholdWarningData } =
-        quick_strategy;
-    const config: TConfigItem[][] = STRATEGIES[selected_strategy]?.fields;
+    const { quick_strategy } = useStore();
+    const { selected_strategy, form_data, initializeLossThresholdWarningData } = quick_strategy;
+    const config: TConfigItem[][] = STRATEGIES()[selected_strategy]?.fields;
     const [dynamic_schema, setDynamicSchema] = useState(Yup.object().shape({}));
     const is_mounted = useRef(true);
 
@@ -61,16 +64,16 @@ const FormikWrapper: React.FC<TFormikWrapper> = observer(({ children }) => {
     const getInitialValue = () => {
         const data = getSavedValues();
         initial_value = {
-            symbol: data?.symbol ?? qs_config.QUICK_STRATEGY.DEFAULT.symbol,
+            symbol: data?.symbol ?? qs_config().QUICK_STRATEGY.DEFAULT.symbol,
             tradetype: data?.tradetype ?? '',
             type: data?.type ?? '',
-            durationtype: data?.durationtype ?? qs_config.QUICK_STRATEGY.DEFAULT.durationtype,
+            durationtype: data?.durationtype ?? qs_config().QUICK_STRATEGY.DEFAULT.durationtype,
             duration: data?.duration ?? '1',
             stake: data?.stake ?? '1',
             loss: data?.loss ?? '',
             profit: data?.profit ?? '',
-            size: data?.size ?? String(qs_config.QUICK_STRATEGY.DEFAULT.size),
-            unit: data?.unit ?? String(qs_config.QUICK_STRATEGY.DEFAULT.unit),
+            size: data?.size ?? String(qs_config().QUICK_STRATEGY.DEFAULT.size),
+            unit: data?.unit ?? String(qs_config().QUICK_STRATEGY.DEFAULT.unit),
             action: data?.action ?? 'RUN',
             max_stake: data?.max_stake ?? 10,
             boolean_max_stake: data?.boolean_max_stake ?? false,
@@ -97,20 +100,19 @@ const FormikWrapper: React.FC<TFormikWrapper> = observer(({ children }) => {
     }, []);
 
     const updateSchema = (formikData: TFormData) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const sub_schema: Record<string, any> = {};
         config.forEach(group => {
             if (!group?.length) return null;
-            group.forEach(async field => {
+            group.forEach(field => {
                 if (field?.validation?.length && field?.name) {
                     if (field.validation.includes('number')) {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         let schema: Record<string, any> = Yup.number().typeError(localize('Must be a number'));
                         let min = 0;
                         let max = 10;
                         let min_error = getErrorMessage('MIN', min);
                         let max_error = getErrorMessage('MAX', max);
                         let integer_error_message = '';
+                        const { current_duration_min_max } = quick_strategy;
                         if (field.name === 'duration' && current_duration_min_max) {
                             min = current_duration_min_max.min;
                             max = current_duration_min_max.max;
@@ -164,10 +166,12 @@ const FormikWrapper: React.FC<TFormikWrapper> = observer(({ children }) => {
                                     }
                                 } else if (typeof validation === 'object') {
                                     if (validation?.type) {
-                                        schema = schema[validation.type](
-                                            validation.value,
-                                            localize(validation.getMessage(validation.value))
-                                        );
+                                        // Use dynamic value if available
+                                        const value = validation.getDynamicValue
+                                            ? validation.getDynamicValue(quick_strategy)
+                                            : validation.value;
+
+                                        schema = schema[validation.type](value, localize(validation.getMessage(value)));
                                     }
                                 }
                             });
@@ -202,14 +206,26 @@ const FormikWrapper: React.FC<TFormikWrapper> = observer(({ children }) => {
 });
 
 const QuickStrategy = observer(() => {
-    const { quick_strategy } = useDBotStore();
-    const { ui } = useStore();
-    const { is_desktop } = ui;
+    const { quick_strategy } = useStore();
+    const { isDesktop } = useDevice();
     const { is_open, setFormVisibility, form_data, selected_strategy } = quick_strategy;
 
     const active_tab_ref = useRef<HTMLDivElement>(null);
     const [current_step, setCurrentStep] = React.useState(QsSteps.StrategySelect);
     const [selected_trade_type, setSelectedTradeType] = React.useState('');
+
+    // Prevent body scrolling when modal is open
+    React.useEffect(() => {
+        if (is_open) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [is_open]);
 
     const sendRudderStackQsFormCloseData = () => {
         const active_tab =
@@ -233,7 +249,7 @@ const QuickStrategy = observer(() => {
         <FormikWrapper>
             <FormikForm>
                 <LossThresholdWarningDialog />
-                {is_desktop ? (
+                {isDesktop ? (
                     <Modal className='modal--strategy' is_open={is_open} width='72rem'>
                         <DesktopFormWrapper
                             onClickClose={handleClose}
@@ -246,28 +262,31 @@ const QuickStrategy = observer(() => {
                         </DesktopFormWrapper>
                     </Modal>
                 ) : (
-                    <MobileFullPageModal
-                        is_modal_open={is_open}
-                        className='quick-strategy__wrapper'
-                        header={
-                            <Text size='xs' weight='bold'>
-                                {localize(
-                                    `Step ${current_step === QsSteps.StrategyCompleted ? 2 : 1}/2: Choose your strategy`
-                                )}
-                            </Text>
-                        }
-                        onClickClose={handleClose}
-                        height_offset='8rem'
-                    >
-                        <MobileFormWrapper
-                            setCurrentStep={setCurrentStep}
-                            current_step={current_step}
-                            selected_trade_type={selected_trade_type}
-                            setSelectedTradeType={setSelectedTradeType}
+                    <>
+                        <MobileFullPageModal
+                            is_modal_open={is_open}
+                            className='quick-strategy__wrapper'
+                            header={
+                                <Text size='xs' weight='bold'>
+                                    {localize(
+                                        `Step ${current_step === QsSteps.StrategyCompleted ? 2 : 1}/2: Choose your strategy`
+                                    )}
+                                </Text>
+                            }
+                            onClickClose={handleClose}
+                            height_offset='8rem'
                         >
-                            <Form />
-                        </MobileFormWrapper>
-                    </MobileFullPageModal>
+                            <MobileFormWrapper
+                                setCurrentStep={setCurrentStep}
+                                current_step={current_step}
+                                selected_trade_type={selected_trade_type}
+                                setSelectedTradeType={setSelectedTradeType}
+                            >
+                                <Form />
+                            </MobileFormWrapper>
+                        </MobileFullPageModal>
+                        <MobileQSFooter setCurrentStep={setCurrentStep} current_step={current_step} />
+                    </>
                 )}
             </FormikForm>
         </FormikWrapper>

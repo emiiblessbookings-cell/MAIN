@@ -1,9 +1,12 @@
+@use 'components/shared/styles/constants' as *;
+@use 'components/shared/styles/mixins' as *;
+
 .summary {
     display: flex;
     align-items: center;
     flex-direction: column;
     justify-content: center;
-    background: linear-gradient(180deg, var(--general-section-2) 0%, rgba(242, 243, 244, 0) 80%);
+    background: linear-gradient(180deg, var(--general-section-2) 0%, rgb(242 243 244 / 0%) 80%);
     width: 100%;
 
     @include desktop-screen {
@@ -41,12 +44,14 @@
         &-title {
             height: 18px;
             margin-bottom: 4px;
+
             @include typeface(--small-center-bold-black, none);
         }
 
         &-content {
             height: 18px;
             margin-bottom: 4px;
+
             @include typeface(--small-center-normal-black, none);
         }
     }

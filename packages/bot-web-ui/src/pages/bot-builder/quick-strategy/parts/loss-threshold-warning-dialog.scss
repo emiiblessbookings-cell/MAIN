@@ -1,10 +1,16 @@
+@use 'components/shared/styles/devices' as *;
+
 .loss-threshold-warning-dialog {
     &__body-text {
         font-size: 1.5rem;
         line-height: 18px;
-        margin: 12px 0px;
+        margin: 12px 0;
         margin-bottom: 22px;
         color: var(--text-general);
+    }
+
+    &.dc-dialog__wrapper--has-portal {
+        background-color: var(--overlay-outside-dialog);
     }
 
     .dc-dialog {
@@ -22,7 +28,7 @@
         }
 
         &__button {
-            @include mobile {
+            @include mobile-screen {
                 margin-inline-start: 0;
             }
         }

@@ -1,5 +1,4 @@
-import React from 'react';
-import { Text } from '@deriv/components';
+import Text from '@/components/shared_ui/text';
 
 const FlyoutText = (props: { text: string }) => {
     const { text } = props;

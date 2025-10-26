@@ -1,17 +1,18 @@
 import React from 'react';
 import localForage from 'localforage';
 import LZString from 'lz-string';
-import { getSavedWorkspaces } from '@deriv/bot-skeleton';
-import { Dialog, Text } from '@deriv/components';
-import { observer } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import { NOTIFICATION_TYPE } from 'Components/bot-notification/bot-notification-utils';
-import { TStrategy } from 'Types';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import { NOTIFICATION_TYPE } from '@/components/bot-notification/bot-notification-utils';
+import Dialog from '@/components/shared_ui/dialog';
+import Text from '@/components/shared_ui/text';
+import { getSavedWorkspaces } from '@/external/bot-skeleton';
+import { useStore } from '@/hooks/useStore';
+import { TStrategy } from '@/types';
+import { localize } from '@deriv-com/translations';
 import './delete-dialog.scss';
 
 const DeleteDialog = observer(() => {
-    const { load_modal, dashboard } = useDBotStore();
+    const { load_modal, dashboard } = useStore();
     const {
         is_delete_modal_open,
         onToggleDeleteDialog,
@@ -46,7 +47,6 @@ const DeleteDialog = observer(() => {
         await resetStrategiesAfterDelete(strategy_id, updated_workspaces);
         onToggleDeleteDialog(false);
     };
-
     return (
         <div>
             <Dialog
@@ -67,13 +67,13 @@ const DeleteDialog = observer(() => {
                 has_close_icon
             >
                 <div>
-                    <Text color='prominent' line_height='s' size='xs'>
+                    <Text color='prominent' lineHeight='s' size='xs'>
                         {localize('Your bot will be permanently deleted when you hit ')}
                         <strong>{localize('Yes, delete.')}</strong>
                     </Text>
                 </div>
                 <div>
-                    <Text color='prominent' line_height='xl' size='xs'>
+                    <Text color='prominent' lineHeight='xl' size='xs'>
                         {localize('Are you sure you want to delete it?')}
                     </Text>
                 </div>

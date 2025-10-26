@@ -1,11 +1,23 @@
 import React, { useEffect } from 'react';
 import classNames from 'classnames';
 import { Field, Form, Formik } from 'formik';
-import { config, save_types } from '@deriv/bot-skeleton';
-import { Button, Icon, Input, MobileFullPageModal, Modal, RadioGroup, Text, ThemedScrollbars } from '@deriv/components';
-import { observer, useStore } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import { useDBotStore } from '../../../../stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import Button from '@/components/shared_ui/button';
+import Input from '@/components/shared_ui/input';
+import MobileFullPageModal from '@/components/shared_ui/mobile-full-page-modal';
+import Modal from '@/components/shared_ui/modal';
+import RadioGroup from '@/components/shared_ui/radio-group';
+import Text from '@/components/shared_ui/text';
+import ThemedScrollbars from '@/components/shared_ui/themed-scrollbars';
+import { config, save_types } from '@/external/bot-skeleton';
+import { useStore } from '@/hooks/useStore';
+import {
+    DerivLightGoogleDriveIcon,
+    DerivLightLocalDeviceIcon,
+    DerivLightMyComputerIcon,
+} from '@deriv/quill-icons/Illustration';
+import { localize } from '@deriv-com/translations';
+import { useDevice } from '@deriv-com/ui';
 import IconRadio from './icon-radio';
 import './save-modal.scss';
 
@@ -42,7 +54,7 @@ const SaveModalForm: React.FC<TSaveModalForm> = ({
         initialValues={{
             is_local: true,
             save_as_collection: false,
-            bot_name: bot_name === config.default_file_name ? '' : bot_name,
+            bot_name: bot_name === config().default_file_name ? '' : bot_name,
         }}
         validate={validateBotName}
         onSubmit={onConfirmSave}
@@ -53,7 +65,7 @@ const SaveModalForm: React.FC<TSaveModalForm> = ({
                 <ThemedScrollbars height={content_height} autohide>
                     <Form className={classNames({ 'form--active-keyboard': is_onscreen_keyboard_active })}>
                         <div className='modal__content'>
-                            <Text size='xs' line_height='l'>
+                            <Text size='xs' lineHeight='l'>
                                 {localize(
                                     'Enter your bot name, choose to save on your computer or Google Drive, and hit '
                                 )}
@@ -68,9 +80,10 @@ const SaveModalForm: React.FC<TSaveModalForm> = ({
                                             placeholder={localize('Untitled Strategy')}
                                             error={touched[field.name] && errors[field.name]}
                                             label={localize('Bot name')}
-                                            onFocus={e => setCurrentFocus(e.currentTarget.name)}
-                                            onBlur={() => setCurrentFocus(null)}
+                                            onFocus={e => setCurrentFocus(e.currentTarget.value)}
+                                            onBlur={() => setCurrentFocus('')}
                                             {...field}
+                                            max_characters={25}
                                         />
                                     )}
                                 </Field>
@@ -90,7 +103,13 @@ const SaveModalForm: React.FC<TSaveModalForm> = ({
                                         label={
                                             <IconRadio
                                                 text={localize('Local')}
-                                                icon={<Icon icon={is_mobile ? 'IcLocal' : 'IcMyComputer'} size={48} />}
+                                                icon={
+                                                    is_mobile ? (
+                                                        <DerivLightLocalDeviceIcon height='48px' width='48px' />
+                                                    ) : (
+                                                        <DerivLightMyComputerIcon height='48px' width='48px' />
+                                                    )
+                                                }
                                             />
                                         }
                                         value={save_types.LOCAL}
@@ -100,7 +119,7 @@ const SaveModalForm: React.FC<TSaveModalForm> = ({
                                         label={
                                             <IconRadio
                                                 text={'Google Drive'}
-                                                icon={<Icon icon={'IcGoogleDrive'} size={48} />}
+                                                icon={<DerivLightGoogleDriveIcon height='48px' width='48px' />}
                                                 google_drive_connected={is_authorised}
                                                 onDriveConnect={onDriveConnect}
                                             />
@@ -113,29 +132,6 @@ const SaveModalForm: React.FC<TSaveModalForm> = ({
                                     />
                                 </RadioGroup>
                             </div>
-                            {/* removed this from the save modal popup because it is not there in the design */}
-                            {/* <>
-                                <Field name='save_as_collection'>
-                                    {({ field }) => (
-                                        <Checkbox
-                                            onChange={() => setFieldValue('save_as_collection', !save_as_collection)}
-                                            defaultChecked={save_as_collection}
-                                            label={
-                                                <Text size='xs' line_height='s' weight='bold'>
-                                                    <Localize i18n_default_text='Save as collection' />
-                                                </Text>
-                                            }
-                                            classNameLabel='save-type__checkbox-text'
-                                            {...field}
-                                        />
-                                    )}
-                                </Field>
-                                <div className='save-type__checkbox-description'>
-                                    {localize(
-                                        'Enabling this allows you to save your blocks as one collection which can be easily integrated into other bots.'
-                                    )}
-                                </div>
-                            </> */}
                         </div>
                         <div
                             className={classNames('modal__footer', {
@@ -165,8 +161,7 @@ const SaveModalForm: React.FC<TSaveModalForm> = ({
     </Formik>
 );
 const SaveModal = observer(() => {
-    const { save_modal, google_drive, dashboard, load_modal } = useDBotStore();
-    const { ui } = useStore();
+    const { save_modal, google_drive, dashboard, load_modal, ui } = useStore();
     const { dashboard_strategies } = load_modal;
     const {
         button_status,
@@ -178,7 +173,8 @@ const SaveModal = observer(() => {
         validateBotName,
     } = save_modal;
     const { is_authorised, onDriveConnect } = google_drive;
-    const { is_onscreen_keyboard_active, setCurrentFocus, is_mobile } = ui;
+    const { is_onscreen_keyboard_active, setCurrentFocus } = ui;
+    const { isMobile } = useDevice();
     const { active_tab } = dashboard;
 
     useEffect(() => {
@@ -187,7 +183,7 @@ const SaveModal = observer(() => {
         }
     }, [active_tab, dashboard_strategies, updateBotName]);
 
-    return is_mobile ? (
+    return isMobile ? (
         <MobileFullPageModal
             is_modal_open={is_save_modal_open}
             className='save-modal__wrapper'
@@ -204,7 +200,7 @@ const SaveModal = observer(() => {
                 onDriveConnect={onDriveConnect}
                 validateBotName={validateBotName}
                 toggleSaveModal={toggleSaveModal}
-                is_mobile={is_mobile}
+                is_mobile={isMobile}
                 is_onscreen_keyboard_active={is_onscreen_keyboard_active}
                 setCurrentFocus={setCurrentFocus}
             />

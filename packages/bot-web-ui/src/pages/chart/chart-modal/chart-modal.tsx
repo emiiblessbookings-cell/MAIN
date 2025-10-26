@@ -1,13 +1,11 @@
-import React, { Suspense } from 'react';
-import { Loading } from '@deriv/components';
-import { observer, useStore } from '@deriv/stores';
+import { Suspense } from 'react';
+import { observer } from 'mobx-react-lite';
+import { Loader, useDevice } from '@deriv-com/ui';
 import ChartModalDesktop from './chart-modal-desktop';
 
 export const ChartModal = observer(() => {
-    const {
-        ui: { is_desktop },
-    } = useStore();
-    return <Suspense fallback={<Loading />}>{is_desktop && <ChartModalDesktop />}</Suspense>;
+    const { isDesktop } = useDevice();
+    return <Suspense fallback={<Loader />}>{isDesktop && <ChartModalDesktop />}</Suspense>;
 });
 
 export default ChartModal;

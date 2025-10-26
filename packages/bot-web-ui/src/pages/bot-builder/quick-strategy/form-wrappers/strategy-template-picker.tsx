@@ -1,10 +1,10 @@
 import React from 'react';
+import { observer } from 'mobx-react-lite';
+import { DBOT_TABS } from '@/constants/bot-contents';
+import { useStore } from '@/hooks/useStore';
 import { LegacyGuide1pxIcon } from '@deriv/quill-icons';
-import { observer } from '@deriv/stores';
 import { Chip, SearchField } from '@deriv-com/quill-ui';
-import { localize } from '@deriv/translations';
-import { DBOT_TABS } from 'Constants/bot-contents';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { localize } from '@deriv-com/translations';
 import StrategyList from './strategy-list';
 import { QsSteps, TRADE_TYPES } from './trade-constants';
 import './strategy-template-picker.scss';
@@ -15,7 +15,7 @@ type TStrategyTemplatePicker = {
 };
 
 const StrategyTemplatePicker = observer(({ setCurrentStep, setSelectedTradeType }: TStrategyTemplatePicker) => {
-    const { dashboard, quick_strategy } = useDBotStore();
+    const { dashboard, quick_strategy } = useStore();
     const { setActiveTabTutorial, setActiveTab, setFAQSearchValue, filterTuotrialTab } = dashboard;
     const { setFormVisibility, setSelectedStrategy } = quick_strategy;
 
@@ -52,8 +52,16 @@ const StrategyTemplatePicker = observer(({ setCurrentStep, setSelectedTradeType 
                     className='strategy-template-picker__icon'
                     onClick={() => {
                         setActiveTab(DBOT_TABS.TUTORIAL);
-                        setActiveTabTutorial(3);
+                        setActiveTabTutorial(2);
                         setFormVisibility(false);
+
+                        // Add a small delay to ensure the tab is selected before scrolling
+                        setTimeout(() => {
+                            const tutorialsSection = document.getElementById('id-tutorials');
+                            if (tutorialsSection) {
+                                tutorialsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            }
+                        }, 100);
                     }}
                 >
                     <LegacyGuide1pxIcon iconSize='sm' />

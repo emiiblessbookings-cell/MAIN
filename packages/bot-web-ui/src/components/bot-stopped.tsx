@@ -1,11 +1,14 @@
 import React from 'react';
-import { Dialog, Icon, Text } from '@deriv/components';
-import { observer } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import Text from '@/components/shared_ui/text';
+import { useStore } from '@/hooks/useStore';
+import { LegacyClose1pxIcon } from '@deriv/quill-icons/Legacy';
+import { Localize, localize } from '@deriv-com/translations';
+import Dialog from './shared_ui/dialog';
+import { standalone_routes } from './shared';
 
 const BotStopped = observer(() => {
-    const { dashboard } = useDBotStore();
+    const { dashboard } = useStore();
     const { is_web_socket_intialised } = dashboard;
     const onClickClose = () => {
         location.reload();
@@ -17,12 +20,12 @@ const BotStopped = observer(() => {
             className={'dc-dialog bot-stopped-dialog'}
             cancel_button_text={localize('Go to Reports')}
             confirm_button_text={localize('Back to Bot')}
-            onCancel={() => location.replace('reports/positions')}
+            onCancel={() => (window.location.href = standalone_routes.positions)}
             onConfirm={() => location.reload()}
         >
             <div className='dc-dialog__content__header'>
                 <Text data-testid='data-title' weight='bold' as='p' align='left' size='s' color='prominent'>
-                    {localize("You're back online")}
+                    <Localize i18n_default_text="You're back online" />
                 </Text>
                 <div
                     data-testid='data-close-button'
@@ -34,13 +37,11 @@ const BotStopped = observer(() => {
                     }}
                     tabIndex={0}
                 >
-                    <Icon icon='IcCross' />
+                    <LegacyClose1pxIcon height='20px' width='20px' fill='var(--text-general)' />
                 </div>
             </div>
             <Text as='p' align='left' size='xs' color='prominent'>
-                {localize(
-                    'The bot has stopped, but your trade may still be running. You can check it on the Reports page.'
-                )}
+                <Localize i18n_default_text='The bot has stopped, but your trade may still be running. You can check it on the Reports page.' />
             </Text>
         </Dialog>
     );

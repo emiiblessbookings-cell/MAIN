@@ -1,31 +1,33 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import classNames from 'classnames';
-import { Button, Icon } from '@deriv/components';
-import { observer, useStore } from '@deriv/stores';
-import { Localize, localize } from '@deriv/translations';
-import { botNotification } from 'Components/bot-notification/bot-notification';
-import { notification_message } from 'Components/bot-notification/bot-notification-utils';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import Button from '@/components/shared_ui/button';
+import { useStore } from '@/hooks/useStore';
+import { DerivLightLocalDeviceIcon, DerivLightMyComputerIcon } from '@deriv/quill-icons/Illustration';
+import { LegacyClose1pxIcon, LegacyInfo1pxIcon } from '@deriv/quill-icons/Legacy';
+import { Localize, localize } from '@deriv-com/translations';
+import { useDevice } from '@deriv-com/ui';
+import { botNotification } from '../bot-notification/bot-notification';
+import { notification_message } from '../bot-notification/bot-notification-utils';
 import LocalFooter from './local-footer';
 import SectionMessage from './section-message';
 import WorkspaceControl from './workspace-control';
 
 const LocalComponent = observer(() => {
-    const { ui } = useStore();
-    const { dashboard, load_modal, blockly_store } = useDBotStore();
+    const { dashboard, load_modal, blockly_store } = useStore();
     const { active_tab, active_tour } = dashboard;
     const { handleFileChange, loaded_local_file, setLoadedLocalFile, imported_strategy_type, is_open_button_loading } =
         load_modal;
 
     const file_input_ref = React.useRef<HTMLInputElement>(null);
     const [is_file_supported, setIsFileSupported] = React.useState(true);
-    const { is_desktop } = ui;
+    const { isDesktop } = useDevice();
     const { is_loading } = blockly_store;
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (loaded_local_file && is_file_supported && imported_strategy_type !== 'pending' && !is_loading) {
             if (imported_strategy_type === 'old') {
-                botNotification(notification_message.strategy_conversion, undefined, {
+                botNotification(notification_message().strategy_conversion, undefined, {
                     closeButton: false,
                 });
             }
@@ -46,17 +48,20 @@ const LocalComponent = observer(() => {
                     <div className='load-strategy__preview-workspace'>
                         <div id='load-strategy__blockly-container' style={{ height: '100%' }}>
                             <div className='load-strategy__local-preview-close'>
-                                <Icon
-                                    data_testid='dt_load-strategy__local-preview-close'
-                                    icon='IcCross'
-                                    onClick={() => setLoadedLocalFile(null)}
+                                <LegacyClose1pxIcon
+                                    onClick={() => {
+                                        setLoadedLocalFile(null);
+                                    }}
+                                    data-testid='dt_load-strategy__local-preview-close'
+                                    height='20px'
+                                    width='20px'
                                 />
                             </div>
                             <WorkspaceControl />
                         </div>
                     </div>
                 </div>
-                {!is_desktop && (
+                {!isDesktop && (
                     <div className='load-strategy__local-footer'>
                         <LocalFooter />
                     </div>
@@ -73,7 +78,14 @@ const LocalComponent = observer(() => {
                     ref={file_input_ref}
                     accept='application/xml, text/xml'
                     style={{ display: 'none' }}
-                    onChange={e => setIsFileSupported(handleFileChange(e, false))}
+                    onChange={e => {
+                        const is_supported = handleFileChange(e, false);
+                        !is_supported &&
+                            botNotification(notification_message().xml_import_error, undefined, {
+                                className: 'error-toast',
+                            });
+                        setIsFileSupported(is_supported);
+                    }}
                     data-testid='dt-load-strategy-file-input'
                 />
 
@@ -81,7 +93,7 @@ const LocalComponent = observer(() => {
                     message={localize(
                         'Importing XML files from Binary Bot and other third-party platforms may take longer.'
                     )}
-                    icon='IcInfoOutline'
+                    icon={<LegacyInfo1pxIcon fill='#e18d00' iconSize='xs' />}
                     className='load-strategy__section_message'
                 />
 
@@ -92,9 +104,15 @@ const LocalComponent = observer(() => {
                         handleFileChange(e, false);
                     }}
                 >
-                    {is_desktop ? (
+                    {!isDesktop ? (
+                        <DerivLightLocalDeviceIcon height='96px' width='96px' className='load-strategy__local-icon' />
+                    ) : (
                         <React.Fragment>
-                            <Icon icon='IcPc' className='load-strategy__local-icon' size={is_desktop ? 128 : 96} />
+                            <DerivLightMyComputerIcon
+                                height='128px'
+                                width='128px'
+                                className='load-strategy__local-icon'
+                            />
                             <div className='load-strategy__local-title'>
                                 <Localize i18n_default_text='Drag your XML file here' />
                             </div>
@@ -102,8 +120,6 @@ const LocalComponent = observer(() => {
                                 <Localize i18n_default_text='or, if you prefer...' />
                             </div>
                         </React.Fragment>
-                    ) : (
-                        <Icon icon='IcLocal' className='load-strategy__local-icon' size={is_desktop ? 128 : 96} />
                     )}
                     <Button
                         text={

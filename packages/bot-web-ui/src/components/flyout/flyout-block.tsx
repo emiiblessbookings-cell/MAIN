@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
-import { observer } from '@deriv/stores';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '@/hooks/useStore';
 
 type FlyoutBlockProps = {
     block_node: Element;
@@ -9,7 +9,7 @@ type FlyoutBlockProps = {
 };
 
 const FlyoutBlock = observer(({ block_node, should_hide_display_name }: FlyoutBlockProps) => {
-    const { flyout } = useDBotStore();
+    const { flyout } = useStore();
     const { initBlockWorkspace } = flyout;
 
     let el_block_workspace = React.useRef();

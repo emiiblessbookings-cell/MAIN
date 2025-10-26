@@ -1,16 +1,17 @@
-import React from 'react';
 import classnames from 'classnames';
-import { DataList, Icon, Text } from '@deriv/components';
-import { observer, useStore } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import { contract_stages } from 'Constants/contract-stage';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import Text from '@/components/shared_ui/text';
+import { contract_stages } from '@/constants/contract-stage';
+import { useStore } from '@/hooks/useStore';
+import { DerivLightEmptyCardboardBoxIcon } from '@deriv/quill-icons/Illustration';
+import { Localize } from '@deriv-com/translations';
+import { useDevice } from '@deriv-com/ui';
+import DataList from '../data-list';
 import { TCheckedFilters, TFilterMessageValues, TJournalDataListArgs } from './journal.types';
 import { JournalItem, JournalLoader, JournalTools } from './journal-components';
 
 const Journal = observer(() => {
-    const { ui } = useStore();
-    const { journal, run_panel } = useDBotStore();
+    const { journal, run_panel } = useStore();
     const {
         checked_filters,
         filterMessage,
@@ -24,12 +25,12 @@ const Journal = observer(() => {
 
     const filtered_messages_length = Array.isArray(filtered_messages) && filtered_messages.length;
     const unfiltered_messages_length = Array.isArray(unfiltered_messages) && unfiltered_messages.length;
-    const { is_desktop } = ui;
+    const { isDesktop } = useDevice();
 
     return (
         <div
             className={classnames('journal run-panel-tab__content--no-stat', {
-                'run-panel-tab__content': is_desktop,
+                'run-panel-tab__content': isDesktop,
             })}
             data-testid='dt_mock_journal'
         >
@@ -54,39 +55,45 @@ const Journal = observer(() => {
                         !!Object.keys(checked_filters as TCheckedFilters).length &&
                         !unfiltered_messages_length &&
                         is_stop_button_visible ? (
-                            <JournalLoader is_mobile={!is_desktop} />
+                            <JournalLoader is_mobile={!isDesktop} />
                         ) : (
                             <div className='journal-empty'>
-                                <Icon icon='IcBox' className='journal-empty__icon' size={64} color='secondary' />
+                                <DerivLightEmptyCardboardBoxIcon
+                                    height='64px'
+                                    width='64px'
+                                    className='journal-empty__icon icon-general-fill-g-path'
+                                    color='secondary'
+                                    fill='var(--text-general)'
+                                />
                                 <Text
                                     as='h4'
                                     size='xs'
                                     weight='bold'
                                     align='center'
                                     color='less-prominent'
-                                    line_height='xxs'
+                                    lineHeight='s'
                                     className='journal-empty__header'
                                 >
-                                    {localize('There are no messages to display')}
+                                    <Localize i18n_default_text='There are no messages to display' />
                                 </Text>
                                 <div className='journal-empty__message'>
                                     <Text size='xxs' color='less-prominent'>
-                                        {localize('Here are the possible reasons:')}
+                                        <Localize i18n_default_text='Here are the possible reasons:' />
                                     </Text>
                                     <ul className='journal-empty__list'>
                                         <li>
                                             <Text size='xxs' color='less-prominent'>
-                                                {localize('The bot is not running')}
+                                                <Localize i18n_default_text='The bot is not running' />
                                             </Text>
                                         </li>
                                         <li>
                                             <Text size='xxs' color='less-prominent'>
-                                                {localize('The stats are cleared')}
+                                                <Localize i18n_default_text='The stats are cleared' />
                                             </Text>
                                         </li>
                                         <li>
                                             <Text size='xxs' color='less-prominent'>
-                                                {localize('All messages are filtered out')}
+                                                <Localize i18n_default_text='All messages are filtered out' />
                                             </Text>
                                         </li>
                                     </ul>

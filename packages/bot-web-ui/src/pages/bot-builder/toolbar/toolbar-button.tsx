@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button, Popover } from '@deriv/components';
+import Button from '@/components/shared_ui/button';
+import Popover from '@/components/shared_ui/popover';
 
 type TToolbarButton = {
     popover_message?: string;
@@ -8,6 +8,7 @@ type TToolbarButton = {
     buttonOnClick: () => void;
     icon?: React.ReactElement;
     button_text: string;
+    is_bot_running?: boolean;
 };
 
 const ToolbarButton = ({
@@ -17,12 +18,23 @@ const ToolbarButton = ({
     buttonOnClick,
     icon,
     button_text,
-}: TToolbarButton) => (
-    <Popover alignment='bottom' message={popover_message} should_disable_pointer_events>
+    is_bot_running,
+}: TToolbarButton) => {
+    const button = (
         <Button id={button_id} className={button_classname} has_effect onClick={buttonOnClick} icon={icon} green>
             {button_text}
         </Button>
-    </Popover>
-);
+    );
+
+    if (is_bot_running) {
+        return button;
+    }
+
+    return (
+        <Popover alignment='bottom' message={popover_message} should_disable_pointer_events>
+            {button}
+        </Popover>
+    );
+};
 
 export default ToolbarButton;

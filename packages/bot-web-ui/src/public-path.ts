@@ -1,6 +1,4 @@
-import { getLoginId } from '@deriv/bot-skeleton/src/services/api/appId';
-
-const getUrlBase = (path = '') => {
+export const getUrlBase = (path = '') => {
     const l = window.location;
 
     if (!/^\/(br_)/.test(l.pathname)) return path;
@@ -11,10 +9,11 @@ const getUrlBase = (path = '') => {
 };
 
 export function setBotPublicPath(path: string) {
-    __webpack_public_path__ = path; // eslint-disable-line no-global-assign
+    window.__webpack_public_path__ = '';
+    window.__webpack_public_path__ = path; // eslint-disable-line no-global-assign
 }
 
-export const getImageLocation = (image_name: string) => getUrlBase(`/public/images/common/${image_name}`);
+export const getImageLocation = (image_name: string) => `assets/images/${image_name}`;
 
 declare global {
     interface Window {
@@ -32,8 +31,10 @@ const setSurvicateUserAttributes = (country: string, type: string, creationDate:
     }
 };
 
-// eslint-disable-next-line import/no-mutable-exports
 let initSurvicateCalled = false;
+const setSurvicateCalledValue = (value: boolean) => {
+    initSurvicateCalled = value;
+};
 
 const loadSurvicateScript = (callback: () => void) => {
     const script = document.createElement('script');
@@ -52,10 +53,9 @@ const loadSurvicateScript = (callback: () => void) => {
 
 const initSurvicate = () => {
     if (initSurvicateCalled) return;
-    initSurvicateCalled = true;
-    const active_loginid = getLoginId();
-    const client_accounts = JSON.parse(localStorage.getItem('client.accounts') as string) || undefined;
-
+    setSurvicateCalledValue(true);
+    const active_loginid = localStorage.getItem('active_loginid');
+    const client_accounts = JSON.parse(localStorage.getItem('accountsList') as string) || undefined;
     const setAttributesIfAvailable = () => {
         if (active_loginid && client_accounts) {
             const { residence, account_type, created_at } = client_accounts[active_loginid] || {};
@@ -74,6 +74,6 @@ const initSurvicate = () => {
     }
 };
 
-export { initSurvicate, initSurvicateCalled };
+export { initSurvicate, setSurvicateCalledValue };
 
 setBotPublicPath(getUrlBase('/'));

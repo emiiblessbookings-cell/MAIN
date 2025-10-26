@@ -1,11 +1,13 @@
 import React from 'react';
 import classNames from 'classnames';
 import { Field, FieldProps, useFormikContext } from 'formik';
-import { ApiHelpers } from '@deriv/bot-skeleton';
-import { Autocomplete, Text } from '@deriv/components';
-import { TItem } from '@deriv/components/src/components/dropdown-list';
-import { observer, useStore } from '@deriv/stores';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import Autocomplete from '@/components/shared_ui/autocomplete';
+import { TItem } from '@/components/shared_ui/dropdown-list';
+import Text from '@/components/shared_ui/text';
+import { ApiHelpers } from '@/external/bot-skeleton';
+import { useStore } from '@/hooks/useStore';
+import { useDevice } from '@deriv-com/ui';
 import { TApiHelpersInstance, TDropdownItems, TFormData } from '../types';
 
 type TContractTypes = {
@@ -14,10 +16,9 @@ type TContractTypes = {
 };
 
 const ContractTypes: React.FC<TContractTypes> = observer(({ name }) => {
-    const { ui } = useStore();
-    const { is_desktop } = ui;
+    const { isDesktop } = useDevice();
     const [list, setList] = React.useState<TDropdownItems[]>([]);
-    const { quick_strategy } = useDBotStore();
+    const { quick_strategy } = useStore();
     const { setValue } = quick_strategy;
     const { setFieldValue, values } = useFormikContext<TFormData>();
     const { symbol, tradetype } = values;
@@ -26,8 +27,8 @@ const ContractTypes: React.FC<TContractTypes> = observer(({ name }) => {
         if (tradetype && symbol) {
             const selected = values?.type;
             const getContractTypes = async () => {
-                const { contracts_for } = ApiHelpers.instance as unknown as TApiHelpersInstance;
-                const categories = await contracts_for.getContractTypes(tradetype);
+                const { contracts_for } = (ApiHelpers?.instance as unknown as TApiHelpersInstance) ?? {};
+                const categories = await contracts_for?.getContractTypes?.(tradetype);
                 setList(categories);
                 const has_selected = categories?.some(contract => contract.value === selected);
                 if (!has_selected) {
@@ -52,7 +53,7 @@ const ContractTypes: React.FC<TContractTypes> = observer(({ name }) => {
             <Field name={name} key={key} id={key}>
                 {({ field }: FieldProps) => {
                     const selected_item = list?.find(item => item?.value === field?.value);
-                    if (!is_desktop) {
+                    if (!isDesktop) {
                         return (
                             <ul className='qs__form__field__list' data-testid='dt_qs_contract_types'>
                                 {list.map(item => {

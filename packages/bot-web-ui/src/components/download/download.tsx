@@ -1,16 +1,16 @@
-import React from 'react';
-import { Button, Icon, Popover } from '@deriv/components';
-import { observer } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import { downloadFile, getSuccessJournalMessage, TTransaction } from 'Utils/download';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '@/hooks/useStore';
+import { downloadFile, getSuccessJournalMessage, TTransaction } from '@/utils/download';
+import { Localize, localize } from '@deriv-com/translations';
+import Button from '../shared_ui/button';
+import Popover from '../shared_ui/popover';
 
 type TDownloadProps = {
     tab: string;
 };
 
 const Download = observer(({ tab }: TDownloadProps) => {
-    const { run_panel, transactions, journal } = useDBotStore();
+    const { run_panel, transactions, journal } = useStore();
     const { is_clear_stat_disabled, is_running } = run_panel;
     const { filtered_messages } = journal;
     const { transactions: transaction_list } = transactions;
@@ -94,12 +94,13 @@ const Download = observer(({ tab }: TDownloadProps) => {
         >
             <Button
                 id='download-button'
-                is_disabled={disabled}
+                disabled={disabled}
                 className='download__button'
-                text={localize('Download')}
                 onClick={clickFunction}
                 secondary
-            />
+            >
+                <Localize i18n_default_text='Download' />
+            </Button>
         </Popover>
     );
 });

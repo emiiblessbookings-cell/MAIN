@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import classNames from 'classnames';
 import { Field, FieldProps, useFormikContext } from 'formik';
-import { ApiHelpers } from '@deriv/bot-skeleton';
-import { Autocomplete } from '@deriv/components';
-import { TItem } from '@deriv/components/src/components/dropdown-list';
-import { useDBotStore } from 'Stores/useDBotStore';
+import Autocomplete from '@/components/shared_ui/autocomplete';
+import { TItem } from '@/components/shared_ui/dropdown-list';
+import { ApiHelpers } from '@/external/bot-skeleton';
+import { useStore } from '@/hooks/useStore';
 import { TApiHelpersInstance, TDurationUnitItem, TFormData } from '../types';
 
 type TDurationUnit = {
@@ -15,16 +15,16 @@ const DurationUnit: React.FC<TDurationUnit> = ({ attached }: TDurationUnit) => {
     const [list, setList] = React.useState<TDurationUnitItem[]>([]);
     const [prevSymbol, setPrevSymbol] = React.useState('');
     const [prevTradeType, setPrevTradeType] = React.useState('');
-    const { quick_strategy } = useDBotStore();
-    const { setValue, setCurrentDurationMinMax } = quick_strategy;
+    const { quick_strategy } = useStore();
+    const { setValue, setCurrentDurationMinMax, current_duration_min_max } = quick_strategy;
     const { setFieldValue, validateForm, values } = useFormikContext<TFormData>();
     const { symbol, tradetype } = values;
 
     React.useEffect(() => {
         if (tradetype && symbol) {
             const getDurationUnits = async () => {
-                const { contracts_for } = ApiHelpers.instance as unknown as TApiHelpersInstance;
-                const durations = await contracts_for.getDurations(symbol, tradetype);
+                const { contracts_for } = (ApiHelpers?.instance as unknown as TApiHelpersInstance) ?? {};
+                const durations = await contracts_for?.getDurations?.(symbol, tradetype);
                 const duration_units = durations?.map(duration => ({
                     text: duration.display ?? '',
                     value: duration.unit ?? '',
@@ -50,6 +50,10 @@ const DurationUnit: React.FC<TDurationUnit> = ({ attached }: TDurationUnit) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [symbol, tradetype]);
+
+    useEffect(() => {
+        validateForm();
+    }, [current_duration_min_max, validateForm]);
 
     return (
         <div

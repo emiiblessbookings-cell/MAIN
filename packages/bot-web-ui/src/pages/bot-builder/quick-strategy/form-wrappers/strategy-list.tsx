@@ -1,7 +1,7 @@
 import React from 'react';
-import { Text } from '@deriv/components';
-import { localize } from '@deriv/translations';
+import Text from '@/components/shared_ui/text';
 import { Link } from '@deriv-com/quill-ui';
+import { localize } from '@deriv-com/translations';
 import {
     STRATEGY_TRADE_ASSOCIATIONS,
     TRADE_TYPE_INDEX,

@@ -1,19 +1,20 @@
 import React from 'react';
 import { useFormikContext } from 'formik';
-import { Button, Text, ThemedScrollbars } from '@deriv/components';
-import Icon from '@deriv/components/src/components/icon/icon';
-import { observer } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import Button from '@/components/shared_ui/button';
+import Text from '@/components/shared_ui/text';
+import ThemedScrollbars from '@/components/shared_ui/themed-scrollbars';
+import { useStore } from '@/hooks/useStore';
+import { LegacyClose1pxIcon } from '@deriv/quill-icons/Legacy';
+import { localize } from '@deriv-com/translations';
 import { rudderStackSendQsEditStrategyEvent } from '../../../../analytics/rudderstack-quick-strategy';
 import { STRATEGIES } from '../config';
 import { TFormData, TFormValues } from '../types';
-import StrategyTabContent from './strategy-tab-content';
-import useQsSubmitHandler from './useQsSubmitHandler';
 import QSStepper from './qs-stepper';
+import StrategyTabContent from './strategy-tab-content';
 import StrategyTemplatePicker from './strategy-template-picker';
 import { QsSteps } from './trade-constants';
-import '../quick-strategy.scss';
+import useQsSubmitHandler from './useQsSubmitHandler';
 
 type TDesktopFormWrapper = {
     children: React.ReactNode;
@@ -32,18 +33,18 @@ const QuickSelectionPanel = ({
     <>
         <div className='qs__selected-options'>
             <div className='qs__selected-options__item'>
-                <Text size='xs' line_height='s'>
+                <Text size='xs' lineHeight='s'>
                     {localize('Trade type')}
                 </Text>
-                <Text size='xs' weight='bold' line_height='s'>
+                <Text size='xs' weight='bold' lineHeight='s'>
                     {selected_trade_type}
                 </Text>
             </div>
             <div className='qs__selected-options__item'>
-                <Text size='xs' line_height='s'>
+                <Text size='xs' lineHeight='s'>
                     {localize('Strategy')}
                 </Text>
-                <Text className='qs__selected-options__item__description' weight='bold' line_height='s'>
+                <Text className='qs__selected-options__item__description' weight='bold' lineHeight='s'>
                     {selected_startegy_label}
                 </Text>
             </div>
@@ -63,11 +64,11 @@ const FormWrapper = observer(
     }: TDesktopFormWrapper) => {
         const scroll_ref = React.useRef<HTMLDivElement & SVGSVGElement>(null);
         const { submitForm, isValid, setFieldValue, validateForm, values } = useFormikContext<TFormValues>();
-        const { quick_strategy } = useDBotStore();
+        const { quick_strategy } = useStore();
         const { selected_strategy, onSubmit, is_stop_bot_dialog_open } = quick_strategy;
         const { handleSubmit } = useQsSubmitHandler();
 
-        const selected_startegy_label = STRATEGIES[selected_strategy as keyof typeof STRATEGIES].label;
+        const selected_startegy_label = STRATEGIES()[selected_strategy as keyof typeof STRATEGIES].label;
         const is_selected_strategy_step = current_step === QsSteps.StrategySelect;
 
         React.useEffect(() => {
@@ -162,7 +163,7 @@ const FormWrapper = observer(
                                     }
                                 }}
                             >
-                                <Icon icon='IcCross' />
+                                <LegacyClose1pxIcon height='20px' width='20px' />
                             </span>
                         </div>
                     </div>
@@ -177,7 +178,7 @@ const FormWrapper = observer(
                         </div>
                         <div className='qs__body__content'>
                             <ThemedScrollbars
-                                className='qs__form__container qs__form__container--no-footer'
+                                className='qs__form__container qs__form__container--footer'
                                 autohide={false}
                                 refSetter={scroll_ref}
                             >

@@ -1,121 +1,226 @@
 import React from 'react';
-import { observer } from '@deriv/stores';
-import { useDBotStore } from 'Stores/useDBotStore';
-import { TRecentStrategy } from './types';
-import './recent-workspace.scss';
-import { loadStrategy } from '../../../../../bot-skeleton/src/utils/local-storage';
+import classnames from 'classnames';
+import { observer } from 'mobx-react-lite';
+import { getRecentFileIcon } from '@/components/load-modal/recent-workspace';
+import Popover from '@/components/shared_ui/popover';
+import Text from '@/components/shared_ui/text';
+import { DBOT_TABS } from '@/constants/bot-contents';
+import { timeSince } from '@/external/bot-skeleton';
+import { useComponentVisibility } from '@/hooks/useComponentVisibility';
+import { useStore } from '@/hooks/useStore';
+import {
+    LabelPairedPageCircleArrowRightSmRegularIcon,
+    LabelPairedTrashSmRegularIcon,
+} from '@deriv/quill-icons/LabelPaired';
+import { LegacyMenuDots1pxIcon, LegacySave1pxIcon } from '@deriv/quill-icons/Legacy';
+import { Localize } from '@deriv-com/translations';
+import { useDevice } from '@deriv-com/ui';
+import { rudderStackSendDashboardClickEvent } from '../../../analytics/rudderstack-dashboard';
+import { STRATEGY } from '../../../constants/dashboard';
+import './index.scss';
 
-const BOT_EMOJIS = ['🤖', '👾', '🦾', '🧠', '⚡', '💻', '🔮', '🎮'];
-const BOT_DESCRIPTIONS = [
-    "This bot uses moving averages to identify trends. It enters trades when short-term averages cross above long-term ones.",
-    "A volatility-based bot that expands position size during high volatility. It uses Bollinger Bands to determine entry points.",
-    "This mean-reversion bot trades when prices deviate from historical averages. It works best in ranging markets.",
-    "A breakout strategy that enters trades when price moves beyond support/resistance. Uses volume confirmation.",
-    "This bot implements a simple scalping strategy. It aims for small profits with tight stop losses.",
-    "A momentum-based bot that follows strong trending moves. Uses RSI to avoid overbought conditions.",
-    "This grid bot places orders at fixed intervals above and below price. It profits from market oscillations.",
-    "A news-based bot that reacts to economic events. Uses sentiment analysis to determine trade direction."
+export const CONTEXT_MENU = [
+    {
+        type: STRATEGY.OPEN,
+        icon: <LabelPairedPageCircleArrowRightSmRegularIcon fill='var(--text-general)' />,
+        label: <Localize i18n_default_text='Open' />,
+    },
+    {
+        type: STRATEGY.SAVE,
+        icon: (
+            <LegacySave1pxIcon
+                fill='var(--text-general)'
+                className='icon-general-fill-path'
+                iconSize='xs'
+                path=''
+                opacity={0.8}
+            />
+        ),
+        label: <Localize i18n_default_text='Save' />,
+    },
+    {
+        type: STRATEGY.DELETE,
+        icon: <LabelPairedTrashSmRegularIcon fill='var(--text-general)' />,
+        label: <Localize i18n_default_text='Delete' />,
+    },
 ];
 
-const RecentWorkspace = observer(({ workspace, index }: { workspace: TRecentStrategy, index: number }) => {
-    const { dashboard } = useDBotStore();
-    const strategyIdRef = React.useRef(workspace.id);
-    const strategyNameRef = React.useRef(workspace.name || 'Untitled Bot');
-    const perfPercent = React.useMemo(() => {
-        const base = String(strategyIdRef.current || strategyNameRef.current);
-        let h = 0;
-        for (let i = 0; i < base.length; i++) h = (h * 31 + base.charCodeAt(i)) >>> 0;
-        return 55 + (h % 45);
-    }, []);
+type TRecentWorkspace = {
+    index: number;
+    workspace: { [key: string]: string };
+    updateBotName: (name: string) => void;
+};
 
-    const handleClick = async () => {
-        console.log(`[CLICK] Loading bot: ${strategyIdRef.current}, Name: ${strategyNameRef.current}`);
-        try {
-            // Ensure Bot Builder tab is active so Blockly can mount and initialize the workspace
-            dashboard.setActiveTab(1);
+const RecentWorkspace = observer(({ workspace, index }: TRecentWorkspace) => {
+    const { dashboard, load_modal, save_modal } = useStore();
+    const { setActiveTab } = dashboard;
+    const { toggleSaveModal, updateBotName } = save_modal;
+    const {
+        dashboard_strategies = [],
+        getSaveType,
+        getSelectedStrategyID,
+        loadFileFromRecent,
+        onToggleDeleteDialog,
+        previewed_strategy_id,
+        selected_strategy_id,
+        setSelectedStrategyId,
+    } = load_modal;
 
-            // Wait for Blockly workspace to be ready (poll up to ~5s)
-            const waitForWorkspace = () =>
-                new Promise<boolean>(resolve => {
-                    const start = Date.now();
-                    const interval = setInterval(() => {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const Blockly: any = (window as unknown as { Blockly?: unknown }).Blockly;
-                        const ready = !!(Blockly && (Blockly as any).derivWorkspace);
-                        if (ready) {
-                            clearInterval(interval);
-                            resolve(true);
-                        } else if (Date.now() - start > 5000) {
-                            clearInterval(interval);
-                            resolve(false);
-                        }
-                    }, 100);
-                });
+    const trigger_div_ref = React.useRef<HTMLInputElement | null>(null);
+    const toggle_ref = React.useRef<HTMLButtonElement>(null);
+    const is_div_triggered_once = React.useRef<boolean>(false);
+    const visible = useComponentVisibility(toggle_ref);
+    const { setDropdownVisibility, is_dropdown_visible } = visible;
+    const { isDesktop } = useDevice();
 
-            const workspace_ready = await waitForWorkspace();
-            if (!workspace_ready) {
-                console.error('[ERROR] Blockly workspace not initialized in time');
-                return;
-            }
+    React.useEffect(() => {
+        let timer: ReturnType<typeof setTimeout>;
 
-            const success = await loadStrategy(strategyIdRef.current);
-            if (success) {
-                console.log(`[SUCCESS] Bot loaded successfully: ${strategyNameRef.current}`);
-            } else {
-                console.error(`[ERROR] Failed to load bot: ${strategyNameRef.current}`);
-            }
-        } catch (error) {
-            console.error(`[ERROR] Exception while loading bot: ${strategyNameRef.current}`, error);
+        const select_first_strategy = dashboard_strategies?.length && index === 0 && !is_div_triggered_once.current;
+
+        if (select_first_strategy) {
+            timer = setTimeout(() => {
+                is_div_triggered_once.current = true;
+                trigger_div_ref?.current?.click();
+            }, 50);
+        }
+        return () => {
+            if (timer) clearTimeout(timer);
+        };
+    }, [dashboard_strategies, index]);
+
+    const onToggleDropdown = (e: React.MouseEvent<HTMLElement>) => {
+        e.stopPropagation();
+        setDropdownVisibility(!is_dropdown_visible);
+        setSelectedStrategyId(workspace.id);
+    };
+
+    const handleOpen = async () => {
+        await loadFileFromRecent();
+        setActiveTab(DBOT_TABS.BOT_BUILDER);
+        rudderStackSendDashboardClickEvent({ dashboard_click_name: 'open', subpage_name: 'bot_builder' });
+    };
+
+    const handleSave = () => {
+        updateBotName(workspace?.name);
+        toggleSaveModal();
+        rudderStackSendDashboardClickEvent({ dashboard_click_name: 'save', subpage_name: 'dashboard' });
+    };
+
+    const viewRecentStrategy = async (type: string) => {
+        setSelectedStrategyId(workspace.id);
+
+        switch (type) {
+            case STRATEGY.OPEN:
+                await handleOpen();
+                break;
+
+            case STRATEGY.SAVE:
+                handleSave();
+                break;
+
+            case STRATEGY.DELETE:
+                onToggleDeleteDialog(true);
+                rudderStackSendDashboardClickEvent({ dashboard_click_name: 'delete', subpage_name: 'dashboard' });
+                break;
+
+            default:
+                break;
         }
     };
 
-    const randomEmoji = BOT_EMOJIS[index % BOT_EMOJIS.length];
-    const botDescription = BOT_DESCRIPTIONS[index % BOT_DESCRIPTIONS.length];
+    const is_active_mobile = selected_strategy_id === workspace.id && is_dropdown_visible;
+    const text_size = isDesktop ? 'xs' : 'xxs';
 
     return (
-        <div className="dbot-workspace-card" onClick={handleClick} data-bot-id={workspace.id}>
-            {/* Background elements */}
-            <div className="dbot-workspace-card__particles">
-                {Array.from({ length: 12 }).map((_, i) => (
-                    <span key={i}></span>
-                ))}
+        <div
+            className={classnames('bot-list__item', {
+                'bot-list__item--selected': previewed_strategy_id === workspace.id,
+                'bot-list__item--loaded': dashboard_strategies,
+                'bot-list__item--min': !!dashboard_strategies?.length && !isDesktop,
+            })}
+            key={workspace.id}
+            ref={trigger_div_ref}
+            onClick={e => {
+                e.stopPropagation(); //stop event bubbling for child element
+                if (is_dropdown_visible) setDropdownVisibility(false);
+                getSelectedStrategyID(workspace.id);
+                viewRecentStrategy(STRATEGY.INIT);
+            }}
+        >
+            <div className='bot-list__item__label'>
+                <div className='text-wrapper' title={workspace.name}>
+                    <Text align='left' as='p' size={text_size} lineHeight='l'>
+                        {workspace.name}
+                    </Text>
+                </div>
             </div>
-            <div className="dbot-workspace-card__border-glow"></div>
-
-            {/* Content */}
-            <div className="dbot-workspace-card__emoji">{randomEmoji}</div>
-            <div className="dbot-workspace-card__content">
-                <div className="dbot-workspace-card__header">
-                    <div className="dbot-workspace-card__name">
-                        {strategyNameRef.current}
-                    </div>
-                    <button className="dbot-workspace-card__action">
-                        <span>Load</span>
-                        <div className="dbot-workspace-card__arrow">→</div>
-                    </button>
+            <div className='bot-list__item__time-stamp'>
+                <Text align='left' as='p' size={text_size} lineHeight='l'>
+                    {timeSince(workspace.timestamp)}
+                </Text>
+            </div>
+            <div className='bot-list__item__load-type'>
+                {getRecentFileIcon(workspace.save_type, 'bot-list__item__load-type__icon--active')}
+                <div className='bot-list__item__load-type__icon--saved'>
+                    <Text align='left' as='p' size={text_size} lineHeight='l'>
+                        {getSaveType(workspace.save_type)}
+                    </Text>
                 </div>
-                <div className="dbot-workspace-card__description">
-                    {botDescription}
-                </div>
-                <div className="dbot-workspace-card__metrics">
-                    <div className="dbot-workspace-card__meter">
+            </div>
+            {isDesktop ? (
+                <div className='bot-list__item__actions'>
+                    {CONTEXT_MENU.map(item => (
                         <div
-                            className="dbot-workspace-card__meter-fill"
-                            style={{ width: `${perfPercent}%` }}
-                        />
-                        <div className="dbot-workspace-card__meter-shine" />
+                            key={item.type}
+                            className='bot-list__item__actions__action-item'
+                            onClick={e => {
+                                e.stopPropagation();
+                                viewRecentStrategy(item.type);
+                            }}
+                        >
+                            <Popover alignment='top' message={item.label} zIndex={'9999'}>
+                                {item.icon}
+                            </Popover>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <>
+                    <div className='bot-list__item__actions'>
+                        <button ref={toggle_ref} onClick={onToggleDropdown} tabIndex={0}>
+                            <LegacyMenuDots1pxIcon height='20px' width='20px' />
+                        </button>
                     </div>
-                    <div className="dbot-workspace-card__percent">{perfPercent}%</div>
-                </div>
-                <div className="dbot-workspace-card__preview" aria-hidden>
-                    <div className="dbot-workspace-card__preview-line"></div>
-                    <div className="dbot-workspace-card__preview-line"></div>
-                    <div className="dbot-workspace-card__preview-line"></div>
-                    <div className="dbot-workspace-card__preview-line"></div>
-                    <div className="dbot-workspace-card__preview-line"></div>
-                </div>
-            </div>
-            <div className="dbot-workspace-card__shine"></div>
+                    <div
+                        className={classnames('bot-list__item__responsive', {
+                            'bot-list__item__responsive--active': is_active_mobile,
+                            'bot-list__item__responsive--min': dashboard_strategies.length <= 5,
+                        })}
+                    >
+                        {CONTEXT_MENU.map(item => (
+                            <div
+                                key={item.type}
+                                className='bot-list__item__responsive__menu'
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    viewRecentStrategy(item.type);
+                                }}
+                            >
+                                <div className='bot-list__item__responsive__menu__icon'>{item.icon}</div>
+                                <Text
+                                    color='prominent'
+                                    className='bot-list__item__responsive__menu__item'
+                                    as='p'
+                                    size='xs'
+                                >
+                                    {item.label}
+                                </Text>
+                            </div>
+                        ))}
+                    </div>
+                </>
+            )}
         </div>
     );
 });

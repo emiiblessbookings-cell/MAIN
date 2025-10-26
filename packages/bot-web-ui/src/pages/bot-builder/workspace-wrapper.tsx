@@ -1,14 +1,14 @@
 import React from 'react';
-import { observer } from '@deriv/stores';
-import Flyout from 'Components/flyout';
-import { useDBotStore } from 'Stores/useDBotStore';
-import StopBotModal from './stop-bot-modal';
+import { observer } from 'mobx-react-lite';
+import Flyout from '@/components/flyout';
+import { useStore } from '@/hooks/useStore';
+import StopBotModal from '../dashboard/stop-bot-modal';
 import Toolbar from './toolbar';
 import Toolbox from './toolbox';
 import './workspace.scss';
 
 const WorkspaceWrapper = observer(() => {
-    const { blockly_store } = useDBotStore();
+    const { blockly_store } = useStore();
     const { onMount, onUnmount, is_loading } = blockly_store;
 
     React.useEffect(() => {

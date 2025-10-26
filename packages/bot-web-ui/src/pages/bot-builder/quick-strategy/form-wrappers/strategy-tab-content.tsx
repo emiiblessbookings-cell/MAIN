@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { observer } from '@deriv/stores';
-import { useDBotStore } from 'Stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '@/hooks/useStore';
 import { STRATEGIES } from '../config';
 import { TDescription, TDescriptionItem } from '../types';
 import AccordionStrategyGroup from './accordion-strategy-group';
@@ -23,13 +23,13 @@ export type TDataGroupedObjectsByTitle = {
 
 const StrategyTabContent: React.FC<TStrategyDescription> = observer(
     ({ formfields, active_tab, tutorial_selected_strategy }) => {
-        const { quick_strategy } = useDBotStore();
+        const { quick_strategy } = useStore();
         const { selected_strategy } = quick_strategy;
 
         const expanded_subtitles_storage_default: TExpandedSubtitlesStorageDefault = {};
         const [expanded_subtitles_storage, setExpandedSubtitlesStorage] = useState(expanded_subtitles_storage_default);
 
-        const strategy = STRATEGIES[tutorial_selected_strategy || (selected_strategy as keyof typeof STRATEGIES)];
+        const strategy = STRATEGIES()[tutorial_selected_strategy || (selected_strategy as keyof typeof STRATEGIES)];
 
         const makeGroupedObjectsByTitle = () => {
             return strategy?.description?.reduce((acc: TDescription, obj: TDescriptionItem, idx) => {

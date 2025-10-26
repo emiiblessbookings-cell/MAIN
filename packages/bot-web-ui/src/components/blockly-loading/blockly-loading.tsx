@@ -1,16 +1,17 @@
-import React from 'react';
-import { Loading } from '@deriv/components';
-import { observer } from '@deriv/stores';
-import { useDBotStore } from '../../stores/useDBotStore';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '@/hooks/useStore';
+import { Loader } from '@deriv-com/ui';
 
 const BlocklyLoading = observer(() => {
-    const { blockly_store } = useDBotStore();
+    const { blockly_store } = useStore();
     const { is_loading } = blockly_store;
+
     return (
         <>
             {is_loading && (
                 <div className='bot__loading' data-testid='blockly-loader'>
-                    <Loading />
+                    <Loader />
+                    <div>Loading Blockly...</div>
                 </div>
             )}
         </>

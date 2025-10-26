@@ -1,12 +1,12 @@
 import React from 'react';
-import { observer } from '@deriv/stores';
-import { localize } from '@deriv/translations';
-import DraggableResizeWrapper from 'Components/draggable/draggable-resize-wrapper';
-import { useDBotStore } from 'Stores/useDBotStore';
-import Chart from '..';
+import { observer } from 'mobx-react-lite';
+import DraggableResizeWrapper from '@/components/draggable/draggable-resize-wrapper';
+import { useStore } from '@/hooks/useStore';
+import { localize } from '@deriv-com/translations';
+import ChartWrapper from '../chart-wrapper';
 
 const ChartModalDesktop = observer(() => {
-    const { dashboard } = useDBotStore();
+    const { dashboard } = useStore();
     const { is_chart_modal_visible, setChartModalVisibility } = dashboard;
 
     return (
@@ -23,7 +23,7 @@ const ChartModalDesktop = observer(() => {
                     enableResizing
                 >
                     <div className='chart-modal-dialog' data-testid='chart-modal-dialog'>
-                        <Chart show_digits_stats={false} />
+                        <ChartWrapper show_digits_stats={false} />
                     </div>
                 </DraggableResizeWrapper>
             )}
